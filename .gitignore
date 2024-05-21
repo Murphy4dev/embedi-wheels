@@ -1,4 +1,11 @@
 *.o
 *.d
 *.crf
-*.edp
+*.dep
+*.lst
+*.axf
+*.htm
+*.hex
+*.lnp
+*.map
+*.sct
