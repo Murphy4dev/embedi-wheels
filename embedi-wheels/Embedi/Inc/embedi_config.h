@@ -10,7 +10,6 @@ extern "C" {
 #define CFG_PRINTF_TO_UART 1
 
 #define CFG_EMBEDI_DELAY_ENABLE 1
-#define CFG_DELAY_USE_TIMER_IT 0
 #define CFG_DELAY_TIMER 2
 
 #ifdef __cplusplus

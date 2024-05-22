@@ -206,7 +206,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 72-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 65535;
+  htim2.Init.Period = 1000;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -313,12 +313,14 @@ void StartDefaultTask(void const * argument)
   {
 #if 1
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    osDelay(500);
+    osDelay(200);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    osDelay(500);
-    printf("123 \n");
+    osDelay(200);
 #else
-    osDelay(1);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+    embedi_delay_ms(200);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    embedi_delay_ms(200);
 #endif
   }
   /* USER CODE END 5 */
@@ -341,9 +343,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-#if ((CFG_EMBEDI_DELAY_ENABLE == 1) && (CFG_DELAY_USE_TIMER_IT == 1) )
-  embedi_delay_timer_it_callback(htim);
-#endif
+
   /* USER CODE END Callback 1 */
 }
 
