@@ -24,7 +24,13 @@ uint8_t uart2_buff[UART_BUFF_LEN];
 uint8_t uart3_buff[UART_BUFF_LEN];
 uint8_t uart4_buff[UART_BUFF_LEN];
 
-extern UART_HandleTypeDef huart1;
+#if (CFG_PRINTF_TO_UART == 1)
+    extern UART_HandleTypeDef huart1;
+#elif (CFG_PRINTF_TO_UART == 2)
+    extern UART_HandleTypeDef huart2;
+#elif (CFG_PRINTF_TO_UART == 3)
+    extern UART_HandleTypeDef huart3;
+#endif
 
 void embedi_enable_uart1_interrupt(void)
 {

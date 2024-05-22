@@ -1091,6 +1091,11 @@
               <FileType>1</FileType>
               <FilePath>..\Embedi\Src\embedi_uart.c</FilePath>
             </File>
+            <File>
+              <FileName>embedi_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\Src\embedi_delay.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
