@@ -47,9 +47,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     /* do something*/
 
     if (buff) {
-    HAL_UART_Transmit(huart, buff, len, timeout);
-    /* enable uart receive interrupt. keep it*/
-    HAL_UART_Receive_IT(huart, buff, len);
+        HAL_UART_Transmit(huart, buff, len, timeout);
+        /* enable uart receive interrupt. keep it*/
+        HAL_UART_Receive_IT(huart, buff, len);
     }
 
 }
