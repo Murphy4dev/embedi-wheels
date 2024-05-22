@@ -22,7 +22,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "stdio.h"
+#include <stdio.h>
+#if (CFG_UART_ENABLE == 1)
+#include "embedi_uart.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,10 +40,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#if (CFG_UART_ENABLE == 1)
-#define UART_BUFF_LEN 1
-#define UART_TIMEOUT 100
-#endif
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -48,12 +48,7 @@ UART_HandleTypeDef huart1;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-#if (CFG_UART_ENABLE == 1)
-uint8_t uart1_buff[UART_BUFF_LEN];
-uint8_t uart2_buff[UART_BUFF_LEN];
-uint8_t uart3_buff[UART_BUFF_LEN];
-uint8_t uart4_buff[UART_BUFF_LEN];
-#endif
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -210,9 +205,9 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-  #if (CFG_UART_ENABLE == 1)
-  HAL_UART_Receive_IT(&huart1, uart1_buff, UART_BUFF_LEN);
-  #endif
+#if (CFG_UART_ENABLE == 1)
+  embedi_enable_uart1_interrupt();
+#endif
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -246,68 +241,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-#pragma import(__use_no_semihosting)                             
-struct __FILE { 
-	int handle; 
-}; 
-
-FILE __stdout;         
-void _sys_exit(int x) 
-{ 
-	x = x; 
-} 
-
-#if (CFG_UART_ENABLE == 1)
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  uint8_t *buff = NULL;
-  uint8_t len = UART_BUFF_LEN;
-  uint16_t timeout = UART_TIMEOUT;
-
-  if (huart->Instance == USART1) {
-      buff = uart1_buff;
-  } else if (huart->Instance == USART2) {
-      buff = uart2_buff;
-  } else {
-      buff = uart3_buff;
-  }
-  /* do something*/
-
-  if (buff) {
-    HAL_UART_Transmit(huart, buff, len, timeout);
-    /* enable uart receive interrupt. keep it*/
-    HAL_UART_Receive_IT(huart, buff, len);
-  }
-}
-
-int fputc(int ch, FILE *f)
-{
-  USART_TypeDef *uart = NULL;
-
-#if (CFG_PRINTF_TO_UART == 1)
-  uart = USART1;
-#elif (CFG_PRINTF_TO_UART == 2)
-  uart = USART2;
-#elif (CFG_PRINTF_TO_UART == 3)
-  uart = USART3;
-#else
-  uart = NULL;
-#endif
-
-  if (uart) {
-      while ((uart->SR & 0X40) == 0); 
-      uart->DR = (uint8_t) ch;
-  }
-
-	return ch;
-}
-#else
-int fputc(int ch, FILE *f)
-{
-	return ch;
-}
-#endif /* CFG_UART_ENABLE */
 
 /* USER CODE END 4 */
 

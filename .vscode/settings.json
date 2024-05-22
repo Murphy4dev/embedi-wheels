@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "main.h": "c",
+        "stm32f1xx_hal.h": "c",
+        "embedi_uart.h": "c",
+        "embedi_config.h": "c"
+    }
+}
