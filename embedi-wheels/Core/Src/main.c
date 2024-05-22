@@ -311,11 +311,15 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+#if 1
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    osDelay(1000);
+    osDelay(500);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    osDelay(1000);
+    osDelay(500);
     printf("123 \n");
+#else
+    osDelay(1);
+#endif
   }
   /* USER CODE END 5 */
 }

@@ -51,7 +51,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         buff = uart3_buff;
     }
     /* do something*/
-
+    
     if (buff) {
         HAL_UART_Transmit(huart, buff, len, timeout);
         /* enable uart receive interrupt. keep it*/
