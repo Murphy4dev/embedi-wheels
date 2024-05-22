@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'embedi-wheels-2' 
- * Target:  'embedi-wheels-2' 
+ * Project: 'embedi-wheels' 
+ * Target:  'embedi-wheels' 
  */
 
 #ifndef RTE_COMPONENTS_H
