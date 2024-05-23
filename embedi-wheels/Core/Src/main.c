@@ -28,6 +28,7 @@
 #endif
 #include "embedi_delay.h"
 #include "embedi_i2c.h"
+#include "embedi_mpu6050.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -103,7 +104,7 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  embedi_mpu6050_init();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */

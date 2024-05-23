@@ -1,8 +1,7 @@
-#include "stdio.h"
 #include "embedi_config.h"
+#include "stdio.h"
 #ifdef CFG_STM32F1XX
 #include "stm32f1xx_hal.h"
-#include "stm32f1xx_hal_tim.h"
 #endif
 #include "embedi_delay.h"
 #include "embedi_i2c.h"
@@ -23,13 +22,13 @@ GPIO mode configuration
 
 #ifdef CFG_I2C_GPIO_SIMULATION
 #ifdef EXTERNAL_PULL_UP
-#define IIC_SCL(status)                                 \
-    do {                                                \
+#define IIC_SCL(status)                             \
+    do {                                            \
         HAL_GPIO_WritePin(_SCK_PORT, _SCK, status); \
     } while (0)
 
-#define IIC_SDA(status)                                 \
-    do {                                                \
+#define IIC_SDA(status)                             \
+    do {                                            \
         HAL_GPIO_WritePin(_SDA_PORT, _SDA, status); \
     } while (0)
 
@@ -39,20 +38,20 @@ GPIO mode configuration
     } while (0)
 
 #else /* EXTERNAL_PULL_UP */
-#define IIC_SCL(status)                                 \
-    do {                                                \
+#define IIC_SCL(status)                             \
+    do {                                            \
         HAL_GPIO_WritePin(_SCK_PORT, _SCK, status); \
     } while (0)
 
-#define IIC_SDA(status)                                 \
-    do {                                                \
-        GPIO_InitTypeDef GPIO_InitStruct = {            \
-            .Pin = _SDA,                                \
-            .Mode = GPIO_MODE_OUTPUT_PP,                \
-            .Pull = GPIO_NOPULL,                        \
-            .Speed = GPIO_SPEED_FREQ_HIGH,              \
-        };                                              \
-        HAL_GPIO_Init(_SDA_PORT, &GPIO_InitStruct);     \
+#define IIC_SDA(status)                             \
+    do {                                            \
+        GPIO_InitTypeDef GPIO_InitStruct = {        \
+            .Pin = _SDA,                            \
+            .Mode = GPIO_MODE_OUTPUT_PP,            \
+            .Pull = GPIO_NOPULL,                    \
+            .Speed = GPIO_SPEED_FREQ_HIGH,          \
+        };                                          \
+        HAL_GPIO_Init(_SDA_PORT, &GPIO_InitStruct); \
         HAL_GPIO_WritePin(_SDA_PORT, _SDA, status); \
     } while (0)
 
@@ -316,7 +315,38 @@ extern I2C_HandleTypeDef hi2c2;
 #endif
 #endif
 
-int embedi_i2c_read(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
+int embedi_i2c_read_byte(uint8_t addr, uint8_t reg, uint8_t *buf)
+{
+#ifdef CFG_I2C_GPIO_SIMULATION
+    return _i2c_read(addr, reg, 1, buf);
+#else
+    I2C_HandleTypeDef *hi2c = NULL;
+#if (CFG_I2C_INDEX == 1)
+    hi2c = &hi2c1;
+#else
+    hi2c = &hi2c2;
+#endif
+    return HAL_I2C_Mem_Read(hi2c, (uint16_t)addr, (uint16_t)reg, 1, buf, 1, 100);
+#endif
+}
+
+int embedi_i2c_write_byte(uint8_t addr, uint8_t reg, uint8_t data)
+{
+    uint8_t buff = data;
+#ifdef CFG_I2C_GPIO_SIMULATION
+    return _i2c_write(addr, reg, 1, &buff);
+#else
+    I2C_HandleTypeDef *hi2c = NULL;
+#if (CFG_I2C_INDEX == 1)
+    hi2c = &hi2c1;
+#else
+    hi2c = &hi2c2;
+#endif
+    return HAL_I2C_Mem_Write(hi2c, (uint16_t)addr, (uint16_t)reg, 1, &buff, 1, 100);
+#endif
+}
+
+int embedi_i2c_read_block(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
 {
 #ifdef CFG_I2C_GPIO_SIMULATION
     return _i2c_read(addr, reg, len, buf);
@@ -327,12 +357,11 @@ int embedi_i2c_read(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
 #else
     hi2c = &hi2c2;
 #endif
-    return HAL_I2C_Mem_Read(hi2c, (uint16_t)addr, (uint16_t)reg, 1 , buf, (uint16_t)len, 100);
+    return HAL_I2C_Mem_Read(hi2c, (uint16_t)addr, (uint16_t)reg, 1, buf, (uint16_t)len, 100);
 #endif
 }
 
-
-int embedi_i2c_write(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
+int embedi_i2c_write_block(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
 {
 #ifdef CFG_I2C_GPIO_SIMULATION
     return _i2c_write(addr, reg, len, data);
@@ -348,47 +377,14 @@ int embedi_i2c_write(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
 }
 
 extern int run_i2c_test;
-#define MPU6050_RA_GYRO_CONFIG      0x1B
-#define MPU6050_RA_ACCEL_CONFIG     0x1C
-#define MPU6050_RA_PWR_MGMT_1       0x6B
-#define MPU6050_RA_PWR_MGMT_2       0x6C
-#define MPU6050_RA_SMPLRT_DIV       0x19
-#define MPU6050_RA_CONFIG           0x1A
-#define MPU6050_RA_GYRO_CONFIG      0x1B
-#define MPU6050_RA_ACCEL_CONFIG     0x1C
 void emebedi_i2c_test(void)
 {
-    uint8_t data = 0;
     int ret = 0;
+    uint8_t data = 0;
 
     if (run_i2c_test) {
         run_i2c_test = 0;
-
-        data = 0x01;
-        embedi_i2c_write(0xD0, MPU6050_RA_PWR_MGMT_1, 1, &data);		//电源管理寄存器1，取消睡眠模式，选择时钟源为X轴陀螺仪
-        data = 0x00;
-        embedi_i2c_write(0xD0, MPU6050_RA_PWR_MGMT_2, 1, &data);		//电源管理寄存器2，保持默认值0，所有轴均不待机
-        data = 0x09;
-        embedi_i2c_write(0xD0, MPU6050_RA_SMPLRT_DIV, 1, &data);		//采样率分频寄存器，配置采样率
-        data = 0x06;
-        embedi_i2c_write(0xD0, MPU6050_RA_CONFIG, 1, &data);			//配置寄存器，配置DLPF
-        data = 0x18;
-        embedi_i2c_write(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);	//陀螺仪配置寄存器，选择满量程为±2000°/s
-        data = 0x18;
-        embedi_i2c_write(0xD0, MPU6050_RA_ACCEL_CONFIG, 1, &data);	//加速度计配置寄存器，选择满量程为±16g
-
-#if 1
-        ret = embedi_i2c_read(0xD0, 0x75, 1, &data);
+        ret = embedi_i2c_read_block(0xD0, 0x75, 1, &data);
         printf("%d 0x%x\r\n", ret, data);
-
-        ret = embedi_i2c_read(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);
-        printf("read %d 0x%x\r\n", ret, data);
-
-        data = 0x4A;
-        ret = embedi_i2c_write(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);
-        // embedi_delay_ms(10);
-        embedi_i2c_read(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);
-        printf("write %d 0x%x\r\n", ret, data);
-#endif
     }
 }
