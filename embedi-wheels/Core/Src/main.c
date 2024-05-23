@@ -318,9 +318,9 @@ void StartDefaultTask(void const * argument)
     osDelay(200);
 #else
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    embedi_delay_ms(1000);
+    embedi_delay_ms(200);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    embedi_delay_ms(1000);
+    embedi_delay_ms(200);
 #endif
   }
   /* USER CODE END 5 */

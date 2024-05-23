@@ -78,19 +78,15 @@ __asm void _delay_loop(uint32_t count)
 
 void embedi_delay_us(uint32_t microsec)
 {
-    #define CFG_LOOP_CYCLE 4
-    uint32_t count = microsec * CFG_SYSTEM_CLOCK /  CFG_LOOP_CYCLE ;
+    #define LOOP_CYCLE 4
+    uint32_t count = microsec * CFG_SYSTEM_CLOCK /  LOOP_CYCLE ;
 
     _delay_loop(count);
 }
 
 void embedi_delay_ms(uint16_t millisec)
 {
-    uint16_t i = 0;
-
-    for (i = 0; i < millisec; i++) {
-        embedi_delay_us(1000);
-    }
+    embedi_delay_us(millisec * 1000);
 }
 
 #endif /*CFG_EMBEDI_DELAY_ENABLE*/
