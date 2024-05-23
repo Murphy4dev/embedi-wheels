@@ -21,6 +21,7 @@ GPIO mode configuration
 #define HIHG GPIO_PIN_SET
 #define RELEASE HIHG
 
+#ifdef CFG_I2C_GPIO_SIMULATION
 #ifdef EXTERNAL_PULL_UP
 #define IIC_SCL(status)                                 \
     do {                                                \
@@ -240,7 +241,7 @@ static uint8_t _read_byte(uint8_t is_send_ack)
     return receive;
 }
 
-int embedi_i2c_read(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
+static int _i2c_read(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
 {
     if (_start()) {
         return I2C_START_FAIL;
@@ -277,7 +278,7 @@ int embedi_i2c_read(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
     return 0;
 }
 
-int embedi_i2c_write(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
+static int _i2c_write(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
 {
     int i = 0;
 
@@ -307,8 +308,54 @@ int embedi_i2c_write(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
     _stop();
     return I2C_SUCCESS;
 }
+#else
+#if (CFG_I2C_INDEX == 1)
+extern I2C_HandleTypeDef hi2c1;
+#else
+extern I2C_HandleTypeDef hi2c2;
+#endif
+#endif
+
+int embedi_i2c_read(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *buf)
+{
+#ifdef CFG_I2C_GPIO_SIMULATION
+    return _i2c_read(addr, reg, len, buf);
+#else
+    I2C_HandleTypeDef *hi2c = NULL;
+#if (CFG_I2C_INDEX == 1)
+    hi2c = &hi2c1;
+#else
+    hi2c = &hi2c2;
+#endif
+    return HAL_I2C_Mem_Read(hi2c, (uint16_t)addr, (uint16_t)reg, 1 , buf, (uint16_t)len, 100);
+#endif
+}
+
+
+int embedi_i2c_write(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data)
+{
+#ifdef CFG_I2C_GPIO_SIMULATION
+    return _i2c_write(addr, reg, len, data);
+#else
+    I2C_HandleTypeDef *hi2c = NULL;
+#if (CFG_I2C_INDEX == 1)
+    hi2c = &hi2c1;
+#else
+    hi2c = &hi2c2;
+#endif
+    return HAL_I2C_Mem_Write(hi2c, (uint16_t)addr, (uint16_t)reg, 1, data, (uint16_t)len, 100);
+#endif
+}
 
 extern int run_i2c_test;
+#define MPU6050_RA_GYRO_CONFIG      0x1B
+#define MPU6050_RA_ACCEL_CONFIG     0x1C
+#define MPU6050_RA_PWR_MGMT_1       0x6B
+#define MPU6050_RA_PWR_MGMT_2       0x6C
+#define MPU6050_RA_SMPLRT_DIV       0x19
+#define MPU6050_RA_CONFIG           0x1A
+#define MPU6050_RA_GYRO_CONFIG      0x1B
+#define MPU6050_RA_ACCEL_CONFIG     0x1C
 void emebedi_i2c_test(void)
 {
     uint8_t data = 0;
@@ -316,17 +363,31 @@ void emebedi_i2c_test(void)
 
     if (run_i2c_test) {
         run_i2c_test = 0;
+
+        data = 0x01;
+        embedi_i2c_write(0xD0, MPU6050_RA_PWR_MGMT_1, 1, &data);		//电源管理寄存器1，取消睡眠模式，选择时钟源为X轴陀螺仪
+        data = 0x00;
+        embedi_i2c_write(0xD0, MPU6050_RA_PWR_MGMT_2, 1, &data);		//电源管理寄存器2，保持默认值0，所有轴均不待机
+        data = 0x09;
+        embedi_i2c_write(0xD0, MPU6050_RA_SMPLRT_DIV, 1, &data);		//采样率分频寄存器，配置采样率
+        data = 0x06;
+        embedi_i2c_write(0xD0, MPU6050_RA_CONFIG, 1, &data);			//配置寄存器，配置DLPF
+        data = 0x18;
+        embedi_i2c_write(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);	//陀螺仪配置寄存器，选择满量程为±2000°/s
+        data = 0x18;
+        embedi_i2c_write(0xD0, MPU6050_RA_ACCEL_CONFIG, 1, &data);	//加速度计配置寄存器，选择满量程为±16g
+
+#if 1
         ret = embedi_i2c_read(0xD0, 0x75, 1, &data);
         printf("%d 0x%x\r\n", ret, data);
 
-#if 1
-        ret = embedi_i2c_read(0xD0, 0x6B, 1, &data);
+        ret = embedi_i2c_read(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);
         printf("read %d 0x%x\r\n", ret, data);
 
         data = 0x4A;
-        ret = embedi_i2c_write(0xD0, 0x6B, 1, &data);
+        ret = embedi_i2c_write(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);
         // embedi_delay_ms(10);
-        embedi_i2c_read(0xD0, 0x6B, 1, &data);
+        embedi_i2c_read(0xD0, MPU6050_RA_GYRO_CONFIG, 1, &data);
         printf("write %d 0x%x\r\n", ret, data);
 #endif
     }

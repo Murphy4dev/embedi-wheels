@@ -16,6 +16,10 @@ extern "C" {
 /* nop == 1 / CFG_SYSTEM_CLOCK us */
 #define CFG_SYSTEM_CLOCK 72
 
+/* I2C CONFIG */
+#define CFG_I2C_GPIO_SIMULATION
+#define CFG_I2C_INDEX 1
+
 #ifdef __cplusplus
 }
 #endif
