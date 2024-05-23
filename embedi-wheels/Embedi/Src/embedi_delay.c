@@ -25,7 +25,7 @@ static void __embedi_delay_us(uint32_t microsec)
 {
     TIM_HandleTypeDef *timer = NULL;
 
-    uint16_t  differ = 0xffff - microsec - 5;
+    uint16_t differ = 0xffff - microsec - 5;
 #if (CFG_DELAY_TIMER_INDEX == 1)
     timer = &htim1;
 #elif (CFG_DELAY_TIMER_INDEX == 2)
@@ -44,7 +44,7 @@ static void __embedi_delay_us(uint32_t microsec)
     __HAL_TIM_SetCounter(timer, differ);
     HAL_TIM_Base_Start(timer);
 
-    while (differ < 0xffff-5) {
+    while (differ < 0xffff - 5) {
         differ = __HAL_TIM_GetCounter(timer);
     };
 
@@ -63,23 +63,22 @@ void embedi_delay_ms(uint16_t millisec)
     for (i = 0; i < millisec; i++) {
         __embedi_delay_us(1000);
     }
-
 }
 #else
 __asm void _delay_loop(uint32_t count)
 {
     /* 1 instruction sycle */
-    subs    r0, #1; 
+    subs r0, #1;
     /* 3 instruction sycle */
-    bne     _delay_loop;
+    bne _delay_loop;
     /* just run once ignore*/
-    bx      lr;
+    bx lr;
 }
 
 void embedi_delay_us(uint32_t microsec)
 {
-    #define LOOP_CYCLE 4
-    uint32_t count = microsec * CFG_SYSTEM_CLOCK /  LOOP_CYCLE ;
+#define LOOP_CYCLE 4
+    uint32_t count = microsec * CFG_SYSTEM_CLOCK / LOOP_CYCLE;
 
     _delay_loop(count);
 }
