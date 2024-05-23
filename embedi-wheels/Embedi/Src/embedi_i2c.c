@@ -1,3 +1,4 @@
+#include "stdio.h"
 #include "embedi_config.h"
 #ifdef CFG_STM32F1XX
 #include "stm32f1xx_hal.h"
@@ -16,16 +17,19 @@ GPIO mode configuration
     1. SCK should be push-pull ouput
     2. SDA should be push-pull ouput(need to change in/out mode)
 */
+#define LOW GPIO_PIN_RESET
+#define HIHG GPIO_PIN_SET
+#define RELEASE HIHG
 
 #ifdef EXTERNAL_PULL_UP
 #define IIC_SCL(status)                                 \
     do {                                                \
-        HAL_GPIO_WritePin(_SCK_PORT, _SCK, !!(status)); \
+        HAL_GPIO_WritePin(_SCK_PORT, _SCK, status); \
     } while (0)
 
 #define IIC_SDA(status)                                 \
     do {                                                \
-        HAL_GPIO_WritePin(_SDA_PORT, _SDA, !!(status)); \
+        HAL_GPIO_WritePin(_SDA_PORT, _SDA, status); \
     } while (0)
 
 #define REALSE_IIC_SDA()                          \
@@ -36,7 +40,7 @@ GPIO mode configuration
 #else /* EXTERNAL_PULL_UP */
 #define IIC_SCL(status)                                 \
     do {                                                \
-        HAL_GPIO_WritePin(_SCK_PORT, _SCK, !!(status)); \
+        HAL_GPIO_WritePin(_SCK_PORT, _SCK, status); \
     } while (0)
 
 #define IIC_SDA(status)                                 \
@@ -48,7 +52,7 @@ GPIO mode configuration
             .Speed = GPIO_SPEED_FREQ_HIGH,              \
         };                                              \
         HAL_GPIO_Init(_SDA_PORT, &GPIO_InitStruct);     \
-        HAL_GPIO_WritePin(_SDA_PORT, _SDA, !!(status)); \
+        HAL_GPIO_WritePin(_SDA_PORT, _SDA, status); \
     } while (0)
 
 #define REALSE_IIC_SDA()                            \
@@ -199,7 +203,7 @@ static void _send_byte(uint8_t data)
     /* prepare data */
     IIC_SCL(LOW);
     for (i = 0; i < 8; i++) {
-        IIC_SDA((data & 0x80) >> 7);
+        IIC_SDA((GPIO_PinState)((data & 0x80) >> 7));
         data <<= 1;
         embedi_delay_us(2);
         /*sck high data valid*/

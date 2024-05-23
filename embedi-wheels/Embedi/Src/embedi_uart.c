@@ -64,7 +64,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 int fputc(int ch, FILE *f)
 {
     USART_TypeDef *uart = NULL;
-
 #if (CFG_PRINTF_TO_UART == 1)
     uart = USART1;
 #elif (CFG_PRINTF_TO_UART == 2)
