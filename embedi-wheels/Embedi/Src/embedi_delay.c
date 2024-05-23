@@ -3,21 +3,21 @@
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_tim.h"
 #endif
-#if (CFG_EMBEDI_DELAY_ENABLE == 1)
 
-#if (CFG_DELAY_TIMER == 1)
+#ifdef CFG_TIMER_DELAY_ENABLE
+#if (CFG_DELAY_TIMER_INDEX == 1)
 extern TIM_HandleTypeDef htim1;
-#elif (CFG_DELAY_TIMER == 2)
+#elif (CFG_DELAY_TIMER_INDEX == 2)
 extern TIM_HandleTypeDef htim2;
-#elif (CFG_DELAY_TIMER == 3)
+#elif (CFG_DELAY_TIMER_INDEX == 3)
 extern TIM_HandleTypeDef htim3;
-#elif (CFG_DELAY_TIMER == 4)
+#elif (CFG_DELAY_TIMER_INDEX == 4)
 extern TIM_HandleTypeDef htim4;
-#elif (CFG_DELAY_TIMER == 5)
+#elif (CFG_DELAY_TIMER_INDEX == 5)
 extern TIM_HandleTypeDef htim5;
-#elif (CFG_DELAY_TIMER == 6)
+#elif (CFG_DELAY_TIMER_INDEX == 6)
 extern TIM_HandleTypeDef htim6;
-#elif (CFG_DELAY_TIMER == 7)
+#elif (CFG_DELAY_TIMER_INDEX == 7)
 extern TIM_HandleTypeDef htim7;
 #endif
 
@@ -26,19 +26,19 @@ static void __embedi_delay_us(uint32_t microsec)
     TIM_HandleTypeDef *timer = NULL;
 
     uint16_t  differ = 0xffff - microsec - 5;
-#if (CFG_DELAY_TIMER == 1)
+#if (CFG_DELAY_TIMER_INDEX == 1)
     timer = &htim1;
-#elif (CFG_DELAY_TIMER == 2)
+#elif (CFG_DELAY_TIMER_INDEX == 2)
     timer = &htim2;
-#elif (CFG_DELAY_TIMER == 3)
+#elif (CFG_DELAY_TIMER_INDEX == 3)
     timer = &htim3;
-#elif (CFG_DELAY_TIMER == 4)
+#elif (CFG_DELAY_TIMER_INDEX == 4)
     timer = &htim4;
-#elif (CFG_DELAY_TIMER == 5)
+#elif (CFG_DELAY_TIMER_INDEX == 5)
     timer = &htim5;
-#elif (CFG_DELAY_TIMER == 6)
+#elif (CFG_DELAY_TIMER_INDEX == 6)
     timer = &htim6;
-#elif (CFG_DELAY_TIMER == 7)
+#elif (CFG_DELAY_TIMER_INDEX == 7)
     timer = &htim7;
 #endif
     __HAL_TIM_SetCounter(timer, differ);
@@ -66,16 +66,31 @@ void embedi_delay_ms(uint16_t millisec)
 
 }
 #else
+__asm void _delay_loop(uint32_t count)
+{
+    /* 1 instruction sycle */
+    subs    r0, #1; 
+    /* 3 instruction sycle */
+    bne     _delay_loop;
+    /* just run once ignore*/
+    bx      lr;
+}
+
 void embedi_delay_us(uint32_t microsec)
 {
-    (void)(microsec);
-    __NOP();
+    #define CFG_LOOP_CYCLE 4
+    uint32_t count = microsec * CFG_SYSTEM_CLOCK /  CFG_LOOP_CYCLE ;
+
+    _delay_loop(count);
 }
 
 void embedi_delay_ms(uint16_t millisec)
 {
-    (void)(millisec);
-    __NOP();
+    uint16_t i = 0;
+
+    for (i = 0; i < millisec; i++) {
+        embedi_delay_us(1000);
+    }
 }
 
 #endif /*CFG_EMBEDI_DELAY_ENABLE*/

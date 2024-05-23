@@ -18,7 +18,7 @@ void _sys_exit(int x)
 	x = x; 
 } 
 
-#if (CFG_UART_ENABLE == 1)
+#ifdef CFG_UART_ENABLE
 uint8_t uart1_buff[UART_BUFF_LEN];
 uint8_t uart2_buff[UART_BUFF_LEN];
 uint8_t uart3_buff[UART_BUFF_LEN];

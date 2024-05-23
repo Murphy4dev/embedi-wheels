@@ -23,7 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#if (CFG_UART_ENABLE == 1)
+#ifdef CFG_UART_ENABLE
 #include "embedi_uart.h"
 #endif
 #include "embedi_delay.h"
@@ -258,7 +258,7 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-#if (CFG_UART_ENABLE == 1)
+#ifdef CFG_UART_ENABLE
   embedi_enable_uart1_interrupt();
 #endif
   /* USER CODE END USART1_Init 2 */
@@ -311,16 +311,16 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-#if 1
+#if 0
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
     osDelay(200);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
     osDelay(200);
 #else
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    embedi_delay_ms(200);
+    embedi_delay_ms(1000);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    embedi_delay_ms(200);
+    embedi_delay_ms(1000);
 #endif
   }
   /* USER CODE END 5 */
