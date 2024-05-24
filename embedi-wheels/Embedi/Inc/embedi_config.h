@@ -5,6 +5,11 @@
 extern "C" {
 #endif
 #define CFG_STM32F1XX
+#ifdef CFG_STM32F1XX
+#include "stm32f1xx_hal.h"
+#endif
+
+#define CFG_FREERTOS_ENABLE
 
 /* UART CONFIG*/
 #define CFG_UART_ENABLE

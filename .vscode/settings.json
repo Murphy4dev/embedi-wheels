@@ -6,6 +6,8 @@
         "embedi_config.h": "c",
         "stm32f1xx_hal_tim.h": "c",
         "embedi_i2c.h": "c",
-        "embedi_mpu6050.h": "c"
+        "embedi_mpu6050.h": "c",
+        "task.h": "c",
+        "inv_mpu_dmp_motion_driver.h": "c"
     }
 }

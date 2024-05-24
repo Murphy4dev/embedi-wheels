@@ -3,6 +3,10 @@
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_tim.h"
 #endif
+#ifdef CFG_FREERTOS_ENABLE
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
 
 #ifdef CFG_TIMER_DELAY_ENABLE
 #if (CFG_DELAY_TIMER_INDEX == 1)
@@ -87,5 +91,19 @@ void embedi_delay_ms(uint16_t millisec)
 {
     embedi_delay_us(millisec * 1000);
 }
+
+void embedi_get_systick(unsigned long *tick)
+{
+    if (!tick) {
+        return;
+    }
+
+#ifdef CFG_FREERTOS_ENABLE
+    *tick = xTaskGetTickCount();
+#else
+    *tick = HAL_GetTick();
+#endif
+}
+
 
 #endif /*CFG_EMBEDI_DELAY_ENABLE*/

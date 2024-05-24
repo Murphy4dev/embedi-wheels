@@ -1,8 +1,5 @@
 #include "embedi_config.h"
 #include "stdio.h"
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#endif
 #include "embedi_delay.h"
 #include "embedi_i2c.h"
 /*
