@@ -12,6 +12,8 @@ extern "C" {
 #define _SCK_PORT GPIOB
 #define _SDA_PORT GPIOB
 
+#define I2C_DELAY 2
+
 enum {
     I2C_SUCCESS, 
     I2C_ERROR,

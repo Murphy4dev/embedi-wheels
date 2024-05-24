@@ -98,13 +98,13 @@ static int _start(void)
 
     IIC_SDA(HIHG);
     IIC_SCL(HIHG);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
     RECORD_IIC_SWQUENCE(sda, sck);
 
     /*START: when CLK is high,
     DATA change form high to low */
     IIC_SDA(LOW);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
     RECORD_IIC_SWQUENCE(sda, sck);
 
     /*hold i2c bus*/
@@ -128,7 +128,7 @@ static int _stop(void)
 
     IIC_SCL(LOW);
     IIC_SDA(LOW);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
     RECORD_IIC_SWQUENCE(sda, sck);
 
     /*STOP: when CLK is high,
@@ -137,7 +137,7 @@ static int _stop(void)
     RECORD_IIC_SWQUENCE(sda, sck);
 
     IIC_SDA(HIHG);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
     RECORD_IIC_SWQUENCE(sda, sck);
 
     if (sda != STOP_SDA_SEQUENCE ||
@@ -153,10 +153,10 @@ static int _wait_ack(void)
     uint8_t waiting_time = 0;
 
     REALSE_IIC_SDA();
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
 
     IIC_SCL(HIHG);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
 
     while (READ_IIC_SDA()) {
         waiting_time++;
@@ -175,10 +175,10 @@ static void _reponse_ack(void)
 {
     IIC_SCL(LOW);
     IIC_SDA(LOW);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
 
     IIC_SCL(HIHG);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
     IIC_SCL(LOW);
 }
 
@@ -186,10 +186,10 @@ static void _reponse_nack(void)
 {
     IIC_SCL(LOW);
     IIC_SDA(HIHG);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
 
     IIC_SCL(HIHG);
-    embedi_delay_us(2);
+    embedi_delay_us(I2C_DELAY);
     IIC_SCL(LOW);
 }
 
@@ -202,13 +202,13 @@ static void _send_byte(uint8_t data)
     for (i = 0; i < 8; i++) {
         IIC_SDA((GPIO_PinState)((data & 0x80) >> 7));
         data <<= 1;
-        embedi_delay_us(2);
+        embedi_delay_us(I2C_DELAY);
         /*sck high data valid*/
         IIC_SCL(HIHG);
-        embedi_delay_us(2);
+        embedi_delay_us(I2C_DELAY);
         /*sck low data invalid*/
         IIC_SCL(LOW);
-        embedi_delay_us(2);
+        embedi_delay_us(I2C_DELAY);
     }
 }
 
@@ -221,13 +221,13 @@ static uint8_t _read_byte(uint8_t is_send_ack)
     REALSE_IIC_SDA();
     for (i = 0; i < 8; i++) {
         IIC_SCL(LOW);
-        embedi_delay_us(2);
+        embedi_delay_us(I2C_DELAY);
         IIC_SCL(HIHG);
         receive <<= 1;
         if (READ_IIC_SDA()) {
             receive++;
         }
-        embedi_delay_us(2);
+        embedi_delay_us(I2C_DELAY);
     }
     if (is_send_ack)
         _reponse_ack();
