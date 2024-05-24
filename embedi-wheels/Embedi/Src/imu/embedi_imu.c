@@ -56,7 +56,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         accel[1] = (float)data[1] / accel_sens * 9.8;
         accel[2] = (float)data[2] / accel_sens * 9.8;
 
-        printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+        //printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
 
         mpu_get_gyro_reg(data_short, NULL);
         data[0] = (long)data_short[0];

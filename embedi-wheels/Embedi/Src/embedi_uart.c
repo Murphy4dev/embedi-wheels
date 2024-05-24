@@ -37,7 +37,7 @@ void embedi_enable_uart1_interrupt(void)
     HAL_UART_Receive_IT(&huart1, uart1_buff, UART_BUFF_LEN);
 }
 
-int run_i2c_test = 0;
+int run_test = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -53,7 +53,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         buff = uart3_buff;
     }
     /* do something*/
-    run_i2c_test = 1;
+    run_test = buff[0];
     if (buff) {
         HAL_UART_Transmit(huart, buff, len, timeout);
         /* enable uart receive interrupt. keep it*/
