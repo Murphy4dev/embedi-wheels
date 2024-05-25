@@ -11,9 +11,13 @@ enum {
     /* 3 */
     IMU_CALIBRATION = 51,
     /* 4 */
-    FLASH_WRITE = 52,
+    IMU_FLASH_WRITE = 52,
     /* 5 */
-    FLASH_READ = 53
+    IMU_FLASH_READ = 53,
+    /* 6 */
+    FLASH_WRITE = 54,
+    /* 7 */
+    FLASH_READ = 55
 };
 
 #endif

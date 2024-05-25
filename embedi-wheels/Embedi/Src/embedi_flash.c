@@ -103,15 +103,15 @@ void embedi_write_flash(uint32_t addr, uint16_t *buf, uint16_t len)
 extern int run_test;
 void embedi_flash_test(void)
 {
-    uint8_t write_buf[] = {"12345678910"};
+    uint8_t write_buf[] = {"10123456789"};
     uint8_t read_buf[12];
     uint8_t len = sizeof(write_buf) / 2 + ((sizeof(write_buf) % 2) ? 1 : 0);
 
     if (run_test == FLASH_WRITE) {
-        printf("write %s %d \n", write_buf, len);
+        printf("write %s %d %d \n", write_buf, len, run_test);
         embedi_write_flash(IMU_ADDR, (uint16_t *)write_buf, len);
     } else if (run_test == FLASH_READ) {
         embedi_read_flash(IMU_ADDR, (uint16_t *)read_buf, len);
-        printf("read %s %d \n", read_buf, len);
+        printf("read %s %d %d \n", read_buf, len, run_test);
     }
 }

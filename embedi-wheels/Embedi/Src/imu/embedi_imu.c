@@ -3,6 +3,7 @@
 #ifdef CFG_STM32F1XX
 #include "stm32f1xx_hal.h"
 #endif
+#include "embedi_flash.h"
 #include "embedi_i2c.h"
 #include <stdio.h>
 
@@ -17,6 +18,9 @@
 #define ACCEL_Z_TARGET _G
 #define GYRO_TARGET 0
 #define CALI_DATA_LEN 20
+
+extern int run_test;
+static void _read_from_flash(void);
 
 void embedi_imu_init(void)
 {
@@ -42,6 +46,7 @@ void embedi_imu_init(void)
     mpu_get_accel_fsr(&accel_fsr);
 
     printf("imu config %d %d %d \n", gyro_rate, gyro_fsr, accel_fsr);
+    _read_from_flash();
 }
 
 struct imu_bias {
@@ -195,10 +200,91 @@ static void _gyro_data_standardize(long *data, float *gyro)
     gyro[1] = data[1] / gyro_sens * ((2 * 3.1415926) / 360);
     gyro[2] = data[2] / gyro_sens * ((2 * 3.1415926) / 360);
 
-    //printf("gyro data %f %f %f \n",gyro[0], gyro[1], gyro[2]);
+    // printf("gyro data %f %f %f \n",gyro[0], gyro[1], gyro[2]);
 }
 
-extern int run_test;
+static void _read_from_flash(void)
+{
+    union embedi_imu {
+        uint8_t _buf[12];
+        struct cali_data {
+            struct imu_bias accel;
+            struct imu_bias gyro;
+        } bias;
+    };
+
+    union embedi_imu read_data;
+    uint8_t len = sizeof(read_data._buf) / 2 + ((sizeof(read_data._buf) % 2) ? 1 : 0);
+
+    embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+    printf("read %d %d %d %d %d %d len: %d\n",
+            read_data.bias.accel.x_bias,
+            read_data.bias.accel.y_bias,
+            read_data.bias.accel.z_bias,
+            read_data.bias.gyro.x_bias,
+            read_data.bias.gyro.y_bias,
+            read_data.bias.gyro.z_bias, len);
+
+    accel_bias.x_bias = read_data.bias.accel.x_bias;
+    accel_bias.y_bias = read_data.bias.accel.y_bias;
+    accel_bias.z_bias = read_data.bias.accel.z_bias;
+    gyro_bias.x_bias = read_data.bias.gyro.x_bias;
+    gyro_bias.y_bias = read_data.bias.gyro.y_bias;
+    gyro_bias.z_bias = read_data.bias.gyro.z_bias;
+}
+
+static void _write_to_flash(void)
+{
+    union embedi_imu {
+        uint8_t _buf[12];
+        struct cali_data {
+            struct imu_bias accel;
+            struct imu_bias gyro;
+        } bias;
+    };
+
+    union embedi_imu write_data;
+    union embedi_imu read_data;
+
+    write_data.bias.accel.x_bias = accel_bias.x_bias;
+    write_data.bias.accel.y_bias = accel_bias.y_bias;
+    write_data.bias.accel.z_bias = accel_bias.z_bias;
+    write_data.bias.gyro.x_bias = gyro_bias.x_bias;
+    write_data.bias.gyro.y_bias = gyro_bias.y_bias;
+    write_data.bias.gyro.z_bias = gyro_bias.z_bias;
+
+    uint8_t len = sizeof(write_data._buf) / 2 + ((sizeof(write_data._buf) % 2) ? 1 : 0);
+
+    if (run_test == IMU_FLASH_WRITE) {
+        printf("write %d %d %d %d %d %d len: %d\n",
+               write_data.bias.accel.x_bias,
+               write_data.bias.accel.y_bias,
+               write_data.bias.accel.z_bias,
+               write_data.bias.gyro.x_bias,
+               write_data.bias.gyro.y_bias,
+               write_data.bias.gyro.z_bias, len);
+        embedi_write_flash(IMU_ADDR, (uint16_t *)write_data._buf, len);
+    } else if (run_test == IMU_FLASH_READ) {
+        embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+        printf("read %d %d %d %d %d %d len: %d\n",
+               read_data.bias.accel.x_bias,
+               read_data.bias.accel.y_bias,
+               read_data.bias.accel.z_bias,
+               read_data.bias.gyro.x_bias,
+               read_data.bias.gyro.y_bias,
+               read_data.bias.gyro.z_bias, len);
+    }
+}
+
+void embedi_imu_calibration(void)
+{
+    if (run_test == IMU_CALIBRATION) { // 3 scall
+        _accel_callibratin();
+        _gyro_callibratin();
+    }
+    _write_to_flash();
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_12) {
@@ -231,10 +317,3 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     }
 }
 
-void embedi_imu_calibration(void)
-{
-    if (run_test == IMU_CALIBRATION) { // 3 scall
-        _accel_callibratin();
-        _gyro_callibratin();
-    }
-}
