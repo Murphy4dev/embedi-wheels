@@ -1,4 +1,5 @@
 #include "embedi_config.h"
+#include "embedi_test.h"
 #ifdef CFG_STM32F1XX
 #include "stm32f1xx_hal.h"
 #endif
@@ -232,7 +233,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void embedi_imu_calibration(void)
 {
-    if (run_test == 51) { // 3 scall
+    if (run_test == IMU_CALIBRATION) { // 3 scall
         _accel_callibratin();
         _gyro_callibratin();
     }

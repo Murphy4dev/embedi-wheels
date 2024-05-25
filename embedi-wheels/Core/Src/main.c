@@ -30,6 +30,7 @@
 #include "embedi_i2c.h"
 #include "embedi_imu.h"
 #include "embedi_motor.h"
+#include "embedi_flash.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -491,6 +492,7 @@ void StartDefaultTask(void const * argument)
     motor_test();
     emebedi_i2c_test();
     embedi_imu_calibration();
+    embedi_flash_test();
     run_test = 0;
 #else
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);

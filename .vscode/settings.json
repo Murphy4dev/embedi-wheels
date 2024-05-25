@@ -8,6 +8,7 @@
         "embedi_i2c.h": "c",
         "embedi_mpu6050.h": "c",
         "task.h": "c",
-        "inv_mpu_dmp_motion_driver.h": "c"
+        "inv_mpu_dmp_motion_driver.h": "c",
+        "embedi_flash.h": "c"
     }
 }
