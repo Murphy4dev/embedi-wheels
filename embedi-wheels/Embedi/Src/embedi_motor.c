@@ -54,6 +54,7 @@ extern int run_test;
 void motor_test(void)
 {
     int data = 0;
+
     if (run_test == 50) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
