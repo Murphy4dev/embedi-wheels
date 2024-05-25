@@ -10,8 +10,14 @@
 
 /* Starting sampling rate. */
 #define DEFAULT_MPU_HZ (200)
+#define _G (9806L)
+#define ACCEL_X_TARGET 0
+#define ACCEL_Y_TARGET 0
+#define ACCEL_Z_TARGET _G
+#define GYRO_TARGET 0
+#define CALI_DATA_LEN 20
 
-void embedi_mpu6050_init(void)
+void embedi_imu_init(void)
 {
     struct int_param_s int_param;
     unsigned short gyro_rate, gyro_fsr;
@@ -37,36 +43,197 @@ void embedi_mpu6050_init(void)
     printf("imu config %d %d %d \n", gyro_rate, gyro_fsr, accel_fsr);
 }
 
+struct imu_bias {
+    short x_bias;
+    short y_bias;
+    short z_bias;
+};
+static struct imu_bias accel_bias;
+static struct imu_bias gyro_bias;
+
+struct imu_data {
+    long data[3];
+};
+static struct imu_data accel_data[CALI_DATA_LEN];
+static struct imu_data gyro_data[CALI_DATA_LEN];
+static uint8_t accel_cali_ready = 0;
+static uint8_t gyro_cali_ready = 0;
+
+static void _accel_data_collection(long *accel)
+{
+    static int index = 0;
+
+    accel_data[index % CALI_DATA_LEN].data[0] = accel[0];
+    accel_data[index % CALI_DATA_LEN].data[1] = accel[1];
+    accel_data[index % CALI_DATA_LEN].data[2] = accel[2];
+    index++;
+
+    if (index == CALI_DATA_LEN) {
+        index = 0;
+        accel_cali_ready = 1;
+    }
+}
+
+static void _gyro_data_collection(long *gyro)
+{
+    static int index = 0;
+
+    gyro_data[index % CALI_DATA_LEN].data[0] = gyro[0];
+    gyro_data[index % CALI_DATA_LEN].data[1] = gyro[1];
+    gyro_data[index % CALI_DATA_LEN].data[2] = gyro[2];
+    index++;
+
+    if (index == CALI_DATA_LEN) {
+        index = 0;
+        gyro_cali_ready = 1;
+    }
+}
+#define ACCEL_X_TARGET 0
+#define ACCEL_Y_TARGET 0
+#define ACCEL_Z_TARGET _G
+#define GYRO_TARGET 0
+static void _accel_callibratin(void)
+{
+    int index = 0;
+    unsigned short accel_sens = 0;
+    int x_sum, y_sum, z_sum;
+    int x_avg, y_avg, z_avg;
+
+    if (!accel_cali_ready) {
+        printf("accel cali collection not ready \n");
+        return;
+    }
+    x_sum = y_sum = z_sum = 0;
+    x_avg = y_avg = z_avg = 0;
+
+    for (index = 0; index < CALI_DATA_LEN; index++) {
+        x_sum += accel_data[index].data[0];
+        y_sum += accel_data[index].data[1];
+        z_sum += accel_data[index].data[2];
+        printf("acc cali:[%d, %d, %d]\n",
+               accel_data[index].data[0], accel_data[index].data[1],
+               accel_data[index].data[2]);
+    }
+
+    x_avg = x_sum / CALI_DATA_LEN;
+    y_avg = y_sum / CALI_DATA_LEN;
+    z_avg = z_sum / CALI_DATA_LEN;
+    printf("acc avg:[%d, %d, %d]\n", x_avg, y_avg, z_avg);
+
+    mpu_get_accel_sens(&accel_sens);
+    accel_bias.x_bias = (ACCEL_X_TARGET * accel_sens / _G - x_avg);
+    accel_bias.y_bias = (ACCEL_Y_TARGET * accel_sens / _G - y_avg);
+    accel_bias.z_bias = (ACCEL_Z_TARGET * accel_sens / _G - z_avg);
+    printf("acc z_target_raw:[%d] accel_sens:[%d]\n",
+           ACCEL_Z_TARGET * accel_sens / _G, accel_sens);
+    printf("acc bias:[%d, %d, %d]\n",
+           accel_bias.x_bias, accel_bias.y_bias,
+           accel_bias.z_bias);
+}
+
+static void _gyro_callibratin(void)
+{
+    int index = 0;
+    int x_sum, y_sum, z_sum;
+    int x_avg, y_avg, z_avg;
+
+    if (!gyro_cali_ready) {
+        printf("gyro cali collection not ready \n");
+        return;
+    }
+
+    x_sum = y_sum = z_sum = 0;
+    x_avg = y_avg = z_avg = 0;
+
+    for (index = 0; index < CALI_DATA_LEN; index++) {
+        x_sum += gyro_data[index].data[0];
+        y_sum += gyro_data[index].data[1];
+        z_sum += gyro_data[index].data[2];
+        printf("gyro cali:[%d, %d, %d]\n",
+               gyro_data[index].data[0], gyro_data[index].data[1],
+               gyro_data[index].data[2]);
+    }
+
+    x_avg = x_sum / CALI_DATA_LEN;
+    y_avg = y_sum / CALI_DATA_LEN;
+    z_avg = z_sum / CALI_DATA_LEN;
+    printf("gyro avg:[%d, %d, %d]\n", x_avg, y_avg, z_avg);
+
+    gyro_bias.x_bias = GYRO_TARGET - x_avg;
+    gyro_bias.y_bias = GYRO_TARGET - y_avg;
+    gyro_bias.z_bias = GYRO_TARGET - z_avg;
+
+    printf("gyro bias:[%d, %d, %d]\n",
+           gyro_bias.x_bias, gyro_bias.y_bias,
+           gyro_bias.z_bias);
+}
+
+static void _accel_data_standardize(long *data, float *accel)
+{
+    unsigned short accel_sens;
+
+    if (!accel || !data)
+        return;
+    mpu_get_accel_sens(&accel_sens);
+    accel[0] = (float)data[0] / accel_sens * 9.8;
+    accel[1] = (float)data[1] / accel_sens * 9.8;
+    accel[2] = (float)data[2] / accel_sens * 9.8;
+
+    //printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+}
+
+static void _gyro_data_standardize(long *data, float *gyro)
+{
+    float gyro_sens;
+
+    if (!gyro || !data)
+        return;
+
+    mpu_get_gyro_sens(&gyro_sens);
+    gyro[0] = data[0] / gyro_sens * ((2 * 3.1415926) / 360);
+    gyro[1] = data[1] / gyro_sens * ((2 * 3.1415926) / 360);
+    gyro[2] = data[2] / gyro_sens * ((2 * 3.1415926) / 360);
+
+    //printf("gyro data %f %f %f \n",gyro[0], gyro[1], gyro[2]);
+}
+
+extern int run_test;
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_12) {
         short data_short[3];
         long data[3];
-        float accel[3];
-        float gyro[3];
-        unsigned short accel_sens;
-        float gyro_sens;
+        float accel_data[3];
+        float gyro_data[3];
 
         mpu_get_accel_reg(data_short, NULL);
         data[0] = (long)data_short[0];
         data[1] = (long)data_short[1];
         data[2] = (long)data_short[2];
-        mpu_get_accel_sens(&accel_sens);
-        accel[0] = (float)data[0] / accel_sens * 9.8;
-        accel[1] = (float)data[1] / accel_sens * 9.8;
-        accel[2] = (float)data[2] / accel_sens * 9.8;
+        _accel_data_collection(data);
 
-        //printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+        data[0] += accel_bias.x_bias;
+        data[1] += accel_bias.y_bias;
+        data[2] += accel_bias.z_bias;
+        _accel_data_standardize(data, accel_data);
 
         mpu_get_gyro_reg(data_short, NULL);
         data[0] = (long)data_short[0];
         data[1] = (long)data_short[1];
         data[2] = (long)data_short[2];
-        mpu_get_gyro_sens(&gyro_sens);
-        gyro[0] = data[0] / gyro_sens * ((2 * 3.1415926) / 360);
-        gyro[1] = data[1] / gyro_sens * ((2 * 3.1415926) / 360);
-        gyro[2] = data[2] / gyro_sens * ((2 * 3.1415926) / 360);
+        _gyro_data_collection(data);
 
-        // printf("gyro data %f %f %f \n",gyro[0], gyro[1], gyro[2]);
+        data[0] += gyro_bias.x_bias;
+        data[1] += gyro_bias.y_bias;
+        data[2] += gyro_bias.z_bias;
+        _gyro_data_standardize(data, gyro_data);
+    }
+}
+
+void embedi_imu_calibration(void)
+{
+    if (run_test == 51) { // 3 scall
+        _accel_callibratin();
+        _gyro_callibratin();
     }
 }

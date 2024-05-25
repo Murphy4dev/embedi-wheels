@@ -111,7 +111,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  embedi_mpu6050_init();
+  embedi_imu_init();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -490,6 +490,7 @@ void StartDefaultTask(void const * argument)
     osDelay(200);
     motor_test();
     emebedi_i2c_test();
+    embedi_imu_calibration();
     run_test = 0;
 #else
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
