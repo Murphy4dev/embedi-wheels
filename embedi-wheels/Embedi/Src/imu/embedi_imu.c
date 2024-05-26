@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "embedi_config.h"
 #include "embedi_test.h"
 #ifdef CFG_STM32F1XX
@@ -6,13 +7,13 @@
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
 #include "embedi_scope.h"
-#include <stdio.h>
+#include "embedi_kalman.h"
 
 #include "inv_mpu.h"
 #include "inv_mpu_dmp_motion_driver.h"
 
 /* Starting sampling rate. */
-#define DEFAULT_MPU_HZ (200)
+#define DEFAULT_MPU_HZ (5)
 #define _G (9806L)
 #define ACCEL_X_TARGET 0
 #define ACCEL_Y_TARGET 0
@@ -48,6 +49,7 @@ void embedi_imu_init(void)
 
     printf("imu config %d %d %d \n", gyro_rate, gyro_fsr, accel_fsr);
     _read_from_flash();
+    embedi_kalman_init();
 }
 
 struct imu_bias {
@@ -334,4 +336,9 @@ void embedi_get_gyro_data(float *gyro_data)
     data[1] += gyro_bias.y_bias;
     data[2] += gyro_bias.z_bias;
     _gyro_data_standardize(data, gyro_data);
+}
+
+void embedi_get_roll_angle(float *angle)
+{
+
 }

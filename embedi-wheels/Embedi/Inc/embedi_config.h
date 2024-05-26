@@ -27,8 +27,9 @@ extern "C" {
 
 /* IMU data show just only one micro is 1*/
 //#define CFG_IMU_DATA_SCOPE_SHOW
-#define ACCEL_DATA_SHOW 1
+#define ACCEL_DATA_SHOW 0
 #define GRYO_DATA_SHOW 0
+#define ROLL_ANGLE_SHOW 0
 
 #ifdef __cplusplus
 }

@@ -43,10 +43,10 @@ void embedi_task_function(void const *argument)
                 embedi_get_gyro_data(gyro_data);
                 embedi_get_speed(&r_speed, &l_speed);
             } else {
-                motor_test();
-                embedi_get_accel_data(accel_data);
-                embedi_get_gyro_data(gyro_data);
-                embedi_get_speed(&r_speed, &l_speed);
+                //motor_test();
+                //embedi_get_accel_data(accel_data);
+                //embedi_get_gyro_data(gyro_data);
+                //embedi_get_speed(&r_speed, &l_speed);
             }
         }
 #endif
