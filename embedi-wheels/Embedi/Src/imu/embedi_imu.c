@@ -5,6 +5,7 @@
 #endif
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
+#include "embedi_scope.h"
 #include <stdio.h>
 
 #include "inv_mpu.h"
@@ -184,8 +185,16 @@ static void _accel_data_standardize(long *data, float *accel)
     accel[0] = (float)data[0] / accel_sens * 9.8;
     accel[1] = (float)data[1] / accel_sens * 9.8;
     accel[2] = (float)data[2] / accel_sens * 9.8;
-
-    //printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+#ifdef CFG_IMU_DATA_SCOPE_SHOW
+#if (ACCEL_DATA_SHOW == 1)
+    embedi_data_to_scope(accel[0], CHANNEL_1);
+    embedi_data_to_scope(accel[1], CHANNEL_2);
+    embedi_data_to_scope(accel[2], CHANNEL_3);
+    embedi_scope_show();
+#endif
+#else
+    // printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+#endif
 }
 
 static void _gyro_data_standardize(long *data, float *gyro)
@@ -199,8 +208,16 @@ static void _gyro_data_standardize(long *data, float *gyro)
     gyro[0] = data[0] / gyro_sens * ((2 * 3.1415926) / 360);
     gyro[1] = data[1] / gyro_sens * ((2 * 3.1415926) / 360);
     gyro[2] = data[2] / gyro_sens * ((2 * 3.1415926) / 360);
-
+#ifdef CFG_IMU_DATA_SCOPE_SHOW
+#if (GRYO_DATA_SHOW == 1)
+    embedi_data_to_scope(gyro[0], CHANNEL_1);
+    embedi_data_to_scope(gyro[1], CHANNEL_2);
+    embedi_data_to_scope(gyro[2], CHANNEL_3);
+    embedi_scope_show();
+#endif
+#else
     // printf("gyro data %f %f %f \n",gyro[0], gyro[1], gyro[2]);
+#endif
 }
 
 static void _read_from_flash(void)
@@ -218,12 +235,12 @@ static void _read_from_flash(void)
 
     embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
     printf("read %d %d %d %d %d %d len: %d\n",
-            read_data.bias.accel.x_bias,
-            read_data.bias.accel.y_bias,
-            read_data.bias.accel.z_bias,
-            read_data.bias.gyro.x_bias,
-            read_data.bias.gyro.y_bias,
-            read_data.bias.gyro.z_bias, len);
+           read_data.bias.accel.x_bias,
+           read_data.bias.accel.y_bias,
+           read_data.bias.accel.z_bias,
+           read_data.bias.gyro.x_bias,
+           read_data.bias.gyro.y_bias,
+           read_data.bias.gyro.z_bias, len);
 
     accel_bias.x_bias = read_data.bias.accel.x_bias;
     accel_bias.y_bias = read_data.bias.accel.y_bias;
@@ -316,4 +333,3 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         _gyro_data_standardize(data, gyro_data);
     }
 }
-

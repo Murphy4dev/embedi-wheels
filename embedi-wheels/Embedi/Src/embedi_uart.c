@@ -26,15 +26,35 @@ uint8_t uart4_buff[UART_BUFF_LEN];
 
 #if (CFG_PRINTF_TO_UART == 1)
 extern UART_HandleTypeDef huart1;
+UART_HandleTypeDef *huart = &huart1;
 #elif (CFG_PRINTF_TO_UART == 2)
 extern UART_HandleTypeDef huart2;
+UART_HandleTypeDef *huart = &huart2;
 #elif (CFG_PRINTF_TO_UART == 3)
 extern UART_HandleTypeDef huart3;
+UART_HandleTypeDef *huart = &huart3;
 #endif
 
 void embedi_enable_uart1_interrupt(void)
 {
-    HAL_UART_Receive_IT(&huart1, uart1_buff, UART_BUFF_LEN);
+    HAL_UART_Receive_IT(huart, uart1_buff, UART_BUFF_LEN);
+}
+
+void embedi_uart_send_byte(const uint8_t data)
+{
+    USART_TypeDef *uart = NULL;
+#if (CFG_PRINTF_TO_UART == 1)
+    uart = USART1;
+#elif (CFG_PRINTF_TO_UART == 2)
+    uart = USART2;
+#elif (CFG_PRINTF_TO_UART == 3)
+    uart = USART3;
+#else
+    uart = NULL;
+#endif
+    while ((uart->SR & 0X40) == 0)
+        ;
+    uart->DR = data;
 }
 
 int run_test = 0;

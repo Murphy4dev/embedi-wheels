@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void embedi_enable_uart1_interrupt(void);
+void embedi_uart_send_byte(const uint8_t data);
 
 #ifdef __cplusplus
 }

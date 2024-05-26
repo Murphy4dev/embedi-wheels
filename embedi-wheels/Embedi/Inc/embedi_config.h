@@ -25,6 +25,11 @@ extern "C" {
 #define CFG_I2C_GPIO_SIMULATION
 #define CFG_I2C_INDEX 1
 
+/* IMU data show just only one micro is 1*/
+#define CFG_IMU_DATA_SCOPE_SHOW
+#define ACCEL_DATA_SHOW 1
+#define GRYO_DATA_SHOW 0
+
 #ifdef __cplusplus
 }
 #endif

@@ -54,22 +54,24 @@ duty(%) =  = TIM3->CCR2 / ARR(Auto Reload Register)
 extern int run_test;
 void motor_test(void)
 {
-    int data = 0;
-
     if (run_test == MOTOR_START_BACKWARD) { // 2 scall
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
         Set_Pwm(2000, 2000);
+#ifndef CFG_IMU_DATA_SCOPE_SHOW
         printf("motor running...\n");
-    } else if (run_test == MOTOR_START_FORDWARD) {// 1 scall
+#endif
+    } else if (run_test == MOTOR_START_FORDWARD) { // 1 scall
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
         Set_Pwm(2000, 2000);
+#ifndef CFG_IMU_DATA_SCOPE_SHOW
         printf("motor running...\n");
+#endif
     } else if (run_test == MOTOR_STOP) { // 0 scall
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
@@ -77,9 +79,14 @@ void motor_test(void)
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
     }
 
+#ifndef CFG_IMU_DATA_SCOPE_SHOW
+    int data = 0;
+
     data = _read_encoder(2);
     printf("L data %d \n", data);
 
     data = _read_encoder(4);
     printf("R data %d \n", data);
+#endif
 }
+
