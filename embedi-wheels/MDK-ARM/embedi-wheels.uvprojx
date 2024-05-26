@@ -659,6 +659,11 @@
               <FileType>1</FileType>
               <FilePath>..\Embedi\Src\embedi_scope.c</FilePath>
             </File>
+            <File>
+              <FileName>embedi_wheels.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\Src\embedi_wheels.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

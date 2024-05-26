@@ -9,6 +9,9 @@
         "embedi_mpu6050.h": "c",
         "task.h": "c",
         "inv_mpu_dmp_motion_driver.h": "c",
-        "embedi_flash.h": "c"
+        "embedi_flash.h": "c",
+        "cmsis_os.h": "c",
+        "embedi_delay.h": "c",
+        "embedi_wheels.h": "c"
     }
 }

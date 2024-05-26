@@ -22,15 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
-#ifdef CFG_UART_ENABLE
-#include "embedi_uart.h"
-#endif
-#include "embedi_delay.h"
-#include "embedi_i2c.h"
-#include "embedi_imu.h"
-#include "embedi_motor.h"
-#include "embedi_flash.h"
+#include "embedi_wheels.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -112,7 +104,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  embedi_imu_init();
+  embedi_init();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -268,8 +260,7 @@ static void MX_TIM1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM1_Init 2 */
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+
   /* USER CODE END TIM1_Init 2 */
   HAL_TIM_MspPostInit(&htim1);
 
@@ -319,7 +310,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-  HAL_TIM_Encoder_Start(&htim2,TIM_CHANNEL_ALL);
+
   /* USER CODE END TIM2_Init 2 */
 
 }
@@ -368,7 +359,7 @@ static void MX_TIM4_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM4_Init 2 */
-  HAL_TIM_Encoder_Start(&htim4,TIM_CHANNEL_ALL);
+
   /* USER CODE END TIM4_Init 2 */
 
 }
@@ -401,9 +392,7 @@ static void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-#ifdef CFG_UART_ENABLE
-  embedi_enable_uart1_interrupt();
-#endif
+
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -480,27 +469,9 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
-extern int run_test;
   /* Infinite loop */
   for(;;)
   {
-#if 1
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    osDelay(200);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    osDelay(200);
-    motor_test();
-    emebedi_i2c_test();
-    embedi_imu_calibration();
-    embedi_flash_test();
-    run_test = 0;
-#else
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-    embedi_delay_ms(200);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-    embedi_delay_ms(200);
-    emebedi_i2c_test();
-#endif
   }
   /* USER CODE END 5 */
 }
