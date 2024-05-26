@@ -17,7 +17,9 @@ enum {
     /* 6 */
     FLASH_WRITE = 54,
     /* 7 */
-    FLASH_READ = 55
+    FLASH_READ = 55,
+    /* 9 */
+    RUNNING_SWICH = 57
 };
 
 #endif

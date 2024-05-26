@@ -302,34 +302,36 @@ void embedi_imu_calibration(void)
     _write_to_flash();
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void embedi_get_accel_data(float *accel_data)
 {
-    if (GPIO_Pin == GPIO_PIN_12) {
-        short data_short[3];
-        long data[3];
-        float accel_data[3];
-        float gyro_data[3];
+    short data_short[3];
+    long data[3];
 
-        mpu_get_accel_reg(data_short, NULL);
-        data[0] = (long)data_short[0];
-        data[1] = (long)data_short[1];
-        data[2] = (long)data_short[2];
-        _accel_data_collection(data);
+    mpu_get_accel_reg(data_short, NULL);
+    data[0] = (long)data_short[0];
+    data[1] = (long)data_short[1];
+    data[2] = (long)data_short[2];
+    _accel_data_collection(data);
 
-        data[0] += accel_bias.x_bias;
-        data[1] += accel_bias.y_bias;
-        data[2] += accel_bias.z_bias;
-        _accel_data_standardize(data, accel_data);
+    data[0] += accel_bias.x_bias;
+    data[1] += accel_bias.y_bias;
+    data[2] += accel_bias.z_bias;
+    _accel_data_standardize(data, accel_data);
+}
 
-        mpu_get_gyro_reg(data_short, NULL);
-        data[0] = (long)data_short[0];
-        data[1] = (long)data_short[1];
-        data[2] = (long)data_short[2];
-        _gyro_data_collection(data);
+void embedi_get_gyro_data(float *gyro_data)
+{
+    short data_short[3];
+    long data[3];
 
-        data[0] += gyro_bias.x_bias;
-        data[1] += gyro_bias.y_bias;
-        data[2] += gyro_bias.z_bias;
-        _gyro_data_standardize(data, gyro_data);
-    }
+    mpu_get_gyro_reg(data_short, NULL);
+    data[0] = (long)data_short[0];
+    data[1] = (long)data_short[1];
+    data[2] = (long)data_short[2];
+    _gyro_data_collection(data);
+
+    data[0] += gyro_bias.x_bias;
+    data[1] += gyro_bias.y_bias;
+    data[2] += gyro_bias.z_bias;
+    _gyro_data_standardize(data, gyro_data);
 }

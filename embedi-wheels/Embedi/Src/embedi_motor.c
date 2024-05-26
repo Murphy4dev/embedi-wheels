@@ -1,10 +1,16 @@
+#include "embedi_motor.h"
 #include "embedi_config.h"
 #include "embedi_test.h"
+#include <stdio.h>
 #ifdef CFG_STM32F1XX
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_hal_tim.h"
 #endif
-#include <stdio.h>
+
+#define SPEED_DIRECTION (-1) // 0 or -1
+#define RIGHT_LEFT_DIRECTION (1) //0 or 1
+extern int run_test;
+static unsigned char is_started = 0;
 
 static int _read_encoder(int tim)
 {
@@ -31,7 +37,7 @@ static int _read_encoder(int tim)
 #define PWMB TIM1->CCR4 // PA11
 #define PWMA TIM1->CCR1 // PA8
 
-int myabs(int a)
+static int _abs(int a)
 {
     int temp;
     if (a < 0)
@@ -41,52 +47,75 @@ int myabs(int a)
     return temp;
 }
 
-void Set_Pwm(int motor_left, int motor_right)
+static void _set_pwm(int motor_left, int motor_right)
 {
-    PWMB = myabs(motor_left);
-    PWMA = myabs(motor_right);
+    PWMB = _abs(motor_left);
+    PWMA = _abs(motor_right);
+}
+
+void embedi_get_speed(int *right, int *left)
+{
+    *right = _read_encoder(2) * SPEED_DIRECTION;
+#ifndef CFG_IMU_DATA_SCOPE_SHOW
+    printf("L data: %d \n", *right);
+#endif
+
+    *left = _read_encoder(4) * SPEED_DIRECTION;
+#ifndef CFG_IMU_DATA_SCOPE_SHOW
+    printf("R data: %d \n", *left);
+#endif
+}
+
+void embedi_set_direction(enum embedi_direction dir)
+{
+    if (dir == FORDWARD) {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
+    } else {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+    }
+}
+
+void embedi_motor_start(int left, int right)
+{
+    if (!is_started) {
+        is_started = 1;
+        if (RIGHT_LEFT_DIRECTION) {
+            _set_pwm(left, right);
+        } else {
+            _set_pwm(right, left);
+        }
+    }
+}
+
+void embedi_motor_sotp(void)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+    _set_pwm(0, 0);
+    is_started = 0;
 }
 
 /*
 Fpwm(HZ) = corefrequncy / ((ARR+1)*(PSC+1))
 duty(%) =  = TIM3->CCR2 / ARR(Auto Reload Register)
 */
-extern int run_test;
 void motor_test(void)
 {
     if (run_test == MOTOR_START_BACKWARD) { // 2 scall
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
-        Set_Pwm(2000, 2000);
-#ifndef CFG_IMU_DATA_SCOPE_SHOW
-        printf("motor running...\n");
-#endif
+        embedi_set_direction(BACKWARD);
+        embedi_motor_start(2000, 2000);
     } else if (run_test == MOTOR_START_FORDWARD) { // 1 scall
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
-        Set_Pwm(2000, 2000);
-#ifndef CFG_IMU_DATA_SCOPE_SHOW
-        printf("motor running...\n");
-#endif
+        embedi_set_direction(FORDWARD);
+        embedi_motor_start(2000, 2000);
     } else if (run_test == MOTOR_STOP) { // 0 scall
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
+        embedi_motor_sotp();
     }
-
-#ifndef CFG_IMU_DATA_SCOPE_SHOW
-    int data = 0;
-
-    data = _read_encoder(2);
-    printf("L data %d \n", data);
-
-    data = _read_encoder(4);
-    printf("R data %d \n", data);
-#endif
 }
-

@@ -4,21 +4,27 @@
 #include "embedi_i2c.h"
 #include "embedi_imu.h"
 #include "embedi_motor.h"
+#include "embedi_test.h"
 #include "main.h"
 #include <stdio.h>
 #ifdef CFG_UART_ENABLE
 #include "embedi_uart.h"
 #endif
+
+#define TEST_MODE 0
 osThreadId _task_handle;
 void embedi_task(void const *argument);
+SemaphoreHandle_t xSemaphore = NULL;
 
 void embedi_task_function(void const *argument)
 {
-    /* USER CODE BEGIN 5 */
     extern int run_test;
-    /* Infinite loop */
+    float accel_data[3];
+    float gyro_data[3];
+    int r_speed = 0;
+    int l_speed = 0;
     for (;;) {
-#if 1
+#if TEST_MODE
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
         osDelay(200);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
@@ -29,14 +35,22 @@ void embedi_task_function(void const *argument)
         embedi_flash_test();
         run_test = 0;
 #else
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-        embedi_delay_ms(200);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-        embedi_delay_ms(200);
-        emebedi_i2c_test();
+        if (xSemaphoreTake(xSemaphore, 0) == pdTRUE) {
+            if (run_test == RUNNING_SWICH) {
+                embedi_set_direction(FORDWARD);
+                embedi_motor_start(5000, 5000);
+                embedi_get_accel_data(accel_data);
+                embedi_get_gyro_data(gyro_data);
+                embedi_get_speed(&r_speed, &l_speed);
+            } else {
+                motor_test();
+                embedi_get_accel_data(accel_data);
+                embedi_get_gyro_data(gyro_data);
+                embedi_get_speed(&r_speed, &l_speed);
+            }
+        }
 #endif
     }
-    /* USER CODE END 5 */
 }
 
 void embedi_init(void)
@@ -53,6 +67,14 @@ void embedi_init(void)
 #endif
     embedi_imu_init();
 
+    xSemaphore = xSemaphoreCreateBinary();
     osThreadDef(embedi_task, embedi_task_function, osPriorityNormal, 0, 128);
     _task_handle = osThreadCreate(osThread(embedi_task), NULL);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == GPIO_PIN_12) {
+        xSemaphoreGiveFromISR(xSemaphore, NULL);
+    }
 }
