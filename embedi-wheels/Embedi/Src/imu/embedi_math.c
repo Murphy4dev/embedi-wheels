@@ -11,7 +11,7 @@ void embedi_print_matrix(struct matrix *m)
 
     for (int i = 0; i < m->row; i++) {
         for (int j = 0; j < m->colum; j++) {
-            printf("%f ", m->matrix[i][j]);
+                printf("%d ", (int)(m->matrix[i][j] * 1000));
         }
         printf("\n");
     }
@@ -19,6 +19,7 @@ void embedi_print_matrix(struct matrix *m)
 
 void embedi_create_matrix(struct matrix *m, unsigned char row, unsigned char colum)
 {
+#if 1
     if (!m || row > 4 || colum > 4) {
         printf("failed to create matrix \n");
         return;
@@ -30,6 +31,22 @@ void embedi_create_matrix(struct matrix *m, unsigned char row, unsigned char col
             m->matrix[i][j] = 0;
         }
     }
+#endif
+}
+
+void embedi_reset_matrix(struct matrix *m)
+{
+    if (!m) {
+        printf("failed to create matrix \n");
+        return;
+    }
+    for (int i = 0; i < m->row; i++) {
+        for (int j = 0; j < m->colum; j++) {
+            m->matrix[i][j] = 0;
+        }
+    }
+    m->row = 0;
+    m->colum = 0;
 }
 
 void embedi_create_eye_matrix(struct matrix *m, unsigned char row, unsigned char colum)
@@ -53,6 +70,8 @@ void embedi_create_eye_matrix(struct matrix *m, unsigned char row, unsigned char
 
 void embedi_matrix_add(struct matrix *a, struct matrix *b, struct matrix *r)
 {
+    float tmp[4][4];
+
     if (!a || !b || !r) {
         printf("matrix null\n");
         return;
@@ -66,22 +85,58 @@ void embedi_matrix_add(struct matrix *a, struct matrix *b, struct matrix *r)
 
     for (int i = 0; i < a->row; i++) {
         for (int j = 0; j < a->colum; j++) {
-            r->matrix[i][j] = a->matrix[i][j] + b->matrix[i][j];
+            tmp[i][j] = a->matrix[i][j] + b->matrix[i][j];
+        }
+    }
+
+    for (int i = 0; i < a->row; i++) {
+        for (int j = 0; j < a->colum; j++) {
+            r->matrix[i][j] = tmp[i][j];
         }
     }
 }
 
-void embedi_matrix_scale(struct matrix *a, float constant)
+void embedi_matrix_minus(struct matrix *a, struct matrix *b, struct matrix *r)
+{
+    float tmp[4][4];
+
+    if (!a || !b || !r) {
+        printf("matrix null\n");
+        return;
+    }
+
+    if ((a->colum != b->colum) || (a->row != b->row) ||
+        (a->colum != r->colum) || (a->row != r->row)) {
+        printf("failed to do matrix add \n");
+        return;
+    }
+
+    for (int i = 0; i < a->row; i++) {
+        for (int j = 0; j < a->colum; j++) {
+            tmp[i][j] = a->matrix[i][j] - b->matrix[i][j];
+        }
+    }
+
+    for (int i = 0; i < a->row; i++) {
+        for (int j = 0; j < a->colum; j++) {
+            r->matrix[i][j] = tmp[i][j];
+        }
+    }
+}
+
+void embedi_matrix_scale(struct matrix *a, float constant, struct matrix *r)
 {
     for (int i = 0; i < a->row; i++) {
         for (int j = 0; j < a->colum; j++) {
-            a->matrix[i][j] *= constant;
+            r->matrix[i][j] = a->matrix[i][j] * constant;
         }
     }
 }
 
 void embedi_matrix_mul(struct matrix *a, struct matrix *b, struct matrix *r)
 {
+    float tmp[4][4];
+
     if (!a || !b || !r) {
         printf("matrix null\n");
         return;
@@ -89,26 +144,38 @@ void embedi_matrix_mul(struct matrix *a, struct matrix *b, struct matrix *r)
 
     if ((a->colum != b->row) ||
         (a->row != r->row) || (b->colum != r->colum)) {
-        printf("failed to do matrix add \n");
+        printf("failed to do matrix mul %d %d %d %d %d %d\n",
+               a->colum, b->row, a->row, r->row, b->colum, r->colum);
         return;
     }
 
     for (int i = 0; i < a->row; i++) {
         for (int j = 0; j < b->colum; j++) {
-            int sum = 0;
+            float sum = 0;
             for (int k = 0; k < a->colum; k++) {
                 sum += a->matrix[i][k] * b->matrix[k][j];
             }
-            r->matrix[i][j] = sum;
+            tmp[i][j] = sum;
+            // printf("t %d ", (int)(tmp[i][j] * 1000));
         }
     }
+
+    // printf("\n");
+
+    for (int i = 0; i < r->row; i++) {
+        for (int j = 0; j < r->colum; j++) {
+            r->matrix[i][j] = tmp[i][j];
+            // printf("r %d ", (int)(r->matrix[i][j] * 1000));
+        }
+    }
+    // printf("\n");
 }
 
 void embedi_matrix_2x2_inv(struct matrix *a, struct matrix *inv)
 {
     double det = a->matrix[0][0] * a->matrix[1][1] - a->matrix[0][1] * a->matrix[1][0];
     if (det == 0) {
-        printf("ailed to do matrix inv \n");
+        printf("det is 0\n");
         return;
     }
 
@@ -137,7 +204,7 @@ void embedi_matrix_3x3_inv(struct matrix *a, struct matrix *inv)
                 a->matrix[2][0] * (a->matrix[0][1] * a->matrix[1][2] - a->matrix[1][1] * a->matrix[0][2]);
 
     if (!det) {
-        printf("matrix inv not exist\n");
+        printf("det is 0\n");
         return;
     }
     // Mij
@@ -161,51 +228,53 @@ void embedi_matrix_3x3_inv(struct matrix *a, struct matrix *inv)
 
 void embedi_matrix_transpose(struct matrix *a, struct matrix *T)
 {
+#if 1
     if (!a || !T) {
         printf("matrix null\n");
         return;
     }
 
-    for (int i = 0; i < a->row; i++) {
-        for (int j = 0; j < a->colum; j++) {
+    for (int i = 0; i < T->row; i++) {
+        for (int j = 0; j < T->colum; j++) {
             T->matrix[i][j] = a->matrix[j][i];
+            // printf("%d %d\n", i, j);
         }
     }
+#endif
 }
 
 void embedi_matrix_test(void)
 {
-    struct matrix a, b;
+    struct matrix a, b, c;
     struct matrix r;
     struct matrix r_inv;
     struct matrix T;
 
-    embedi_create_matrix(&a, 3, 2);
+    embedi_create_matrix(&a, 2, 2);
     a.matrix[0][0] = 5;
     a.matrix[0][1] = 8;
     a.matrix[1][0] = 4;
     a.matrix[1][1] = 5;
-    a.matrix[2][0] = 7;
-    a.matrix[2][1] = 8;
     // embedi_print_matrix(&a);
     // printf("\n");
 
-    embedi_create_matrix(&b, 2, 3);
+    embedi_create_matrix(&b, 2, 1);
     b.matrix[0][0] = 5;
-    b.matrix[0][1] = 4;
-    b.matrix[0][2] = 3;
-    b.matrix[1][0] = 2;
-    b.matrix[1][1] = 8;
-    b.matrix[1][2] = 10;
+    b.matrix[1][0] = 4;
+
+    embedi_create_matrix(&c, 2, 1);
+    c.matrix[0][0] = 7;
+    c.matrix[1][0] = 8;
+    embedi_matrix_add(&b, &c, &c);
+    ;
+    // embedi_print_matrix(&c);
+    //  printf("\n");
+
+    embedi_matrix_mul(&a, &b, &b);
     // embedi_print_matrix(&b);
-    // printf("\n");
 
     embedi_create_matrix(&r, 3, 3);
     embedi_create_matrix(&r_inv, 3, 3);
-
-    embedi_matrix_mul(&a, &b, &r);
-    // embedi_print_matrix(&r);
-
     r.matrix[0][0] = 1;
     r.matrix[0][1] = 2;
     r.matrix[0][2] = 3;
@@ -220,16 +289,22 @@ void embedi_matrix_test(void)
 
     embedi_matrix_3x3_inv(&r, &r_inv);
     // embedi_print_matrix(&r_inv);
-    // printf("\n");
+    //  printf("\n");
 
-    embedi_matrix_scale(&r_inv, 10);
+    embedi_matrix_scale(&r_inv, 10, &r_inv);
     // embedi_print_matrix(&r_inv);
-    // printf("\n");
+    //  printf("\n");
 
-    embedi_create_matrix(&T, 3, 3);
-    embedi_matrix_transpose(&r_inv, &T);
+    struct matrix vector;
+    embedi_create_matrix(&vector, 3, 1);
+    vector.matrix[0][0] = 1;
+    vector.matrix[1][0] = 2;
+    vector.matrix[2][0] = 3;
+    embedi_create_matrix(&T, 1, 3);
+    embedi_matrix_transpose(&vector, &T);
+    // embedi_print_matrix(&vector);
     // embedi_print_matrix(&T);
-    // printf("\n");
+    //  printf("\n");
 
     embedi_create_matrix(&a, 2, 2);
     embedi_create_matrix(&r_inv, 2, 2);
@@ -238,6 +313,6 @@ void embedi_matrix_test(void)
     a.matrix[1][0] = 1;
     a.matrix[1][1] = 4;
     embedi_matrix_2x2_inv(&a, &r_inv);
-    embedi_print_matrix(&r_inv);
-    printf("\n");
+    // embedi_print_matrix(&r_inv);
+    // printf("\n");
 }
