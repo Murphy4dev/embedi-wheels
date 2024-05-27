@@ -370,8 +370,10 @@ void embedi_get_roll_angle(float *angle)
     embedi_scope_show();
 #endif
 #else
+#if 0
     printf("angle: %d %d %d\n", (int)(accel_angle * 1000 * ANGLE_DIRECTION),
            (int)(m->matrix[0][0] * 1000 * ANGLE_DIRECTION),
            (int)(m->matrix[1][0] * 1000 * ANGLE_DIRECTION));
+#endif
 #endif
 }

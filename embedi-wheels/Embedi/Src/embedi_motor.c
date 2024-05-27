@@ -7,10 +7,10 @@
 #include "stm32f1xx_hal_tim.h"
 #endif
 
-#define SPEED_DIRECTION (-1) // 0 or -1
-#define RIGHT_LEFT_DIRECTION (1) //0 or 1
+#define SPEED_DIRECTION (-1)     // 0 or -1
+#define RIGHT_LEFT_DIRECTION (1) // 0 or 1
+#define MAX_DUTY 7199
 extern int run_test;
-static unsigned char is_started = 0;
 
 static int _read_encoder(int tim)
 {
@@ -57,12 +57,12 @@ void embedi_get_speed(int *right, int *left)
 {
     *right = _read_encoder(2) * SPEED_DIRECTION;
 #ifndef CFG_IMU_DATA_SCOPE_SHOW
-    printf("L data: %d \n", *right);
+    // printf("L data: %d \n", *right);
 #endif
 
     *left = _read_encoder(4) * SPEED_DIRECTION;
 #ifndef CFG_IMU_DATA_SCOPE_SHOW
-    printf("R data: %d \n", *left);
+    // printf("R data: %d \n", *left);
 #endif
 }
 
@@ -83,13 +83,16 @@ void embedi_set_direction(enum embedi_direction dir)
 
 void embedi_motor_start(int left, int right)
 {
-    if (!is_started) {
-        is_started = 1;
-        if (RIGHT_LEFT_DIRECTION) {
-            _set_pwm(left, right);
-        } else {
-            _set_pwm(right, left);
-        }
+    if (left > MAX_DUTY) {
+        left = MAX_DUTY;
+    }
+    if (right > MAX_DUTY) {
+        right = MAX_DUTY;
+    }
+    if (RIGHT_LEFT_DIRECTION) {
+        _set_pwm(left, right);
+    } else {
+        _set_pwm(right, left);
     }
 }
 
@@ -100,7 +103,6 @@ void embedi_motor_sotp(void)
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_RESET);
     _set_pwm(0, 0);
-    is_started = 0;
 }
 
 /*

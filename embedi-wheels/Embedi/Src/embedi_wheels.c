@@ -5,6 +5,7 @@
 #include "embedi_imu.h"
 #include "embedi_kalman.h"
 #include "embedi_motor.h"
+#include "embedi_pid.h"
 #include "embedi_test.h"
 #include "main.h"
 #include <stdio.h>
@@ -13,6 +14,10 @@
 #endif
 
 #define TEST_MODE 0
+#define BALANCE_P (10000)
+#define BALANCE_D (500)
+#define BALANCE_T (0)
+
 osThreadId _task_handle;
 void embedi_task(void const *argument);
 SemaphoreHandle_t xSemaphore = NULL;
@@ -23,9 +28,11 @@ void embedi_task_function(void const *argument)
     int r_speed = 0;
     int l_speed = 0;
     float angle = 0.0;
-
+    struct _pid balance_pd;
+    float balance_pwm = 0;
     // need to IMU systick
     embedi_imu_enable();
+    embedi_pid_init(&balance_pd, BALANCE_T, BALANCE_P, 0, BALANCE_D);
     for (;;) {
 #if TEST_MODE
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
@@ -39,11 +46,17 @@ void embedi_task_function(void const *argument)
         run_test = 0;
 #else
         if (xSemaphoreTake(xSemaphore, 0) == pdTRUE) {
-            if (run_test == RUNNING_SWICH) {
-                embedi_set_direction(FORDWARD);
-                embedi_motor_start(2000, 2000);
+            if (run_test == 0) {
                 embedi_get_roll_angle(&angle);
                 embedi_get_speed(&r_speed, &l_speed);
+                balance_pwm = embedi_pid(&balance_pd, angle);
+                if (balance_pwm < 0) {
+                    embedi_set_direction(FORDWARD);
+                } else {
+                    embedi_set_direction(BACKWARD);
+                }
+                //printf("pwm %d angle %d \n", (int)(balance_pwm), (int)(angle*5000));
+                embedi_motor_start((int)balance_pwm, (int)balance_pwm);
             } else {
                 embedi_motor_sotp();
             }
