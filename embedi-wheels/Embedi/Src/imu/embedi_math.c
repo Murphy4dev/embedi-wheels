@@ -316,3 +316,11 @@ void embedi_matrix_test(void)
     // embedi_print_matrix(&r_inv);
     // printf("\n");
 }
+
+/* taylor expansion arctanx = x - x^3/3  + x^5/5 */
+float embedi_arctan(float x)
+{
+    float talor_r = x - (x * x * x / 3) + (x * x * x * x * x) / 5;
+
+    return talor_r;
+}

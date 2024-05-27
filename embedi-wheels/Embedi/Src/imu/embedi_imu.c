@@ -7,6 +7,7 @@
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
 #include "embedi_kalman.h"
+#include "embedi_math.h"
 #include "embedi_scope.h"
 
 #include "inv_mpu.h"
@@ -20,6 +21,7 @@
 #define ACCEL_Z_TARGET _G
 #define GYRO_TARGET 0
 #define CALI_DATA_LEN 20
+#define ANGLE_DIRECTION (-1) // 1 or -1
 
 extern int run_test;
 static void _read_from_flash(void);
@@ -52,8 +54,6 @@ void embedi_imu_init(void)
 
     mpu_set_sensors(0);
     embedi_kalman_init();
-    embedi_kalman_filter(0.51, 9.75, 0.001);
-    embedi_kalman_filter(0.52, 9.76, 0.002);
 }
 
 void embedi_imu_enable(void)
@@ -204,7 +204,7 @@ static void _accel_data_standardize(long *data, float *accel)
     embedi_scope_show();
 #endif
 #else
-    //printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+    // printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
 #endif
 }
 
@@ -349,4 +349,29 @@ void embedi_get_gyro_data(float *gyro_data)
 
 void embedi_get_roll_angle(float *angle)
 {
+    struct matrix *m;
+    float accel[3];
+    float gyro[3];
+    float accel_angle = 0;
+
+    embedi_get_accel_data(accel);
+    embedi_get_gyro_data(gyro);
+    accel_angle = embedi_arctan(accel[1] / accel[2]);
+
+    embedi_kalman_filter(accel_angle, gyro[0]);
+    m = emebedi_get_kalman_estimation();
+    *angle = m->matrix[0][0] * ANGLE_DIRECTION;
+
+#ifdef CFG_IMU_DATA_SCOPE_SHOW
+#if (ROLL_ANGLE_SHOW == 1)
+    embedi_data_to_scope(accel_angle * 1000, CHANNEL_1);
+    embedi_data_to_scope(m->matrix[0][0] * 1000, CHANNEL_2);
+    embedi_data_to_scope(m->matrix[1][0] * 1000, CHANNEL_3);
+    embedi_scope_show();
+#endif
+#else
+    printf("angle: %d %d %d\n", (int)(accel_angle * 1000 * ANGLE_DIRECTION),
+           (int)(m->matrix[0][0] * 1000 * ANGLE_DIRECTION),
+           (int)(m->matrix[1][0] * 1000 * ANGLE_DIRECTION));
+#endif
 }

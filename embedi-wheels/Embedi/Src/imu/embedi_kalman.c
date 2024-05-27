@@ -161,32 +161,15 @@ static void _update(float accel_angle)
     // printf("_update step5\n");
 }
 
-/* taylor expansion arctanx = x - x^3/3  + x^5/5 */
-static float _arctan(float x)
-{
-    float talor_r = x - (x * x * x / 3) + (x * x * x * x * x) / 5;
-
-    return talor_r;
-}
-
-void embedi_kalman_filter(float accel_y, float accel_z, float gyro)
+void embedi_kalman_filter(float accel_angle, float gyro)
 {
     _predect(gyro);
-
-    float accel_angle = _arctan(accel_y / accel_z);
     _update(accel_angle);
-#ifdef CFG_IMU_DATA_SCOPE_SHOW
-#if (ROLL_ANGLE_SHOW == 1)
-    embedi_data_to_scope(accel_angle * 1000, CHANNEL_1);
-    embedi_data_to_scope(observer.matrix[0][0] * 1000, CHANNEL_2);
-    embedi_data_to_scope(observer.matrix[1][0] * 1000, CHANNEL_3);
-    embedi_scope_show();
-#endif
-#else
-    printf("%d %d %d\n", (int)(accel_angle * 1000),
-           (int)(observer.matrix[0][0] * 1000),
-           (int)(observer.matrix[1][0] * 1000));
-#endif
+}
+
+struct matrix *emebedi_get_kalman_estimation(void)
+{
+    return &observer;
 }
 
 void embedi_kalman_init(void)

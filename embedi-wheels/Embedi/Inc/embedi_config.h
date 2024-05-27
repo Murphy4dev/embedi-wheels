@@ -26,7 +26,7 @@ extern "C" {
 #define CFG_I2C_INDEX 1
 
 /* IMU data show just only one micro is 1*/
-#define CFG_IMU_DATA_SCOPE_SHOW
+//#define CFG_IMU_DATA_SCOPE_SHOW
 #define ACCEL_DATA_SHOW 0
 #define GRYO_DATA_SHOW 0
 #define ROLL_ANGLE_SHOW 1

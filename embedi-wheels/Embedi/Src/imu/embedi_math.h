@@ -26,6 +26,8 @@ void embedi_matrix_2x2_inv(struct matrix *a, struct matrix *inv);
 void embedi_matrix_3x3_inv(struct matrix *a, struct matrix *inv);
 void embedi_matrix_test(void);
 
+float embedi_arctan(float x);
+
 #ifdef __cplusplus
 }
 #endif

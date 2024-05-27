@@ -13,6 +13,7 @@
         "cmsis_os.h": "c",
         "embedi_delay.h": "c",
         "embedi_wheels.h": "c",
-        "embedi_scope.h": "c"
+        "embedi_scope.h": "c",
+        "embedi_kalman.h": "c"
     }
 }

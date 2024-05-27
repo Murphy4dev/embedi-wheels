@@ -20,10 +20,9 @@ SemaphoreHandle_t xSemaphore = NULL;
 void embedi_task_function(void const *argument)
 {
     extern int run_test;
-    float accel_data[3];
-    float gyro_data[3];
     int r_speed = 0;
     int l_speed = 0;
+    float angle = 0.0;
 
     // need to IMU systick
     embedi_imu_enable();
@@ -42,10 +41,8 @@ void embedi_task_function(void const *argument)
         if (xSemaphoreTake(xSemaphore, 0) == pdTRUE) {
             if (run_test == RUNNING_SWICH) {
                 embedi_set_direction(FORDWARD);
-                embedi_motor_start(5000, 5000);
-                embedi_get_accel_data(accel_data);
-                embedi_get_gyro_data(gyro_data);
-                embedi_kalman_filter(accel_data[1], accel_data[2], gyro_data[0]);
+                embedi_motor_start(2000, 2000);
+                embedi_get_roll_angle(&angle);
                 embedi_get_speed(&r_speed, &l_speed);
             } else {
                 embedi_motor_sotp();
