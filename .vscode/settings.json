@@ -15,6 +15,7 @@
         "embedi_wheels.h": "c",
         "embedi_scope.h": "c",
         "embedi_kalman.h": "c",
-        "embedi_pid.h": "c"
+        "embedi_pid.h": "c",
+        "embedi_test.h": "c"
     }
 }

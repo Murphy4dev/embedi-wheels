@@ -1,8 +1,4 @@
 #include "embedi_config.h"
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx_hal_tim.h"
-#endif
 #ifdef CFG_FREERTOS_ENABLE
 #include "FreeRTOS.h"
 #include "task.h"

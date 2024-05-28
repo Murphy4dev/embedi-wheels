@@ -1,11 +1,8 @@
+#include <stdio.h>
 #include "embedi_motor.h"
 #include "embedi_config.h"
 #include "embedi_test.h"
-#include <stdio.h>
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx_hal_tim.h"
-#endif
+
 
 #define SPEED_DIRECTION (-1)     // 0 or -1
 #define RIGHT_LEFT_DIRECTION (1) // 0 or 1

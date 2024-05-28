@@ -1,9 +1,6 @@
 #include "embedi_config.h"
 #include "embedi_test.h"
 #include <stdio.h>
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#endif
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
 #include "embedi_kalman.h"

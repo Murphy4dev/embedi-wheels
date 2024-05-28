@@ -1,11 +1,7 @@
+#include <stdio.h>
 #include "embedi_config.h"
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#include "stm32f1xx_hal_tim.h"
-#endif
 #include "embedi_flash.h"
 #include "embedi_test.h"
-#include <stdio.h>
 
 static uint16_t _read_data(uint32_t addr)
 {

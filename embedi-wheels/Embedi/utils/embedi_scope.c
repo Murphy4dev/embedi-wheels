@@ -1,8 +1,5 @@
 #include "embedi_config.h"
 #include <stdio.h>
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#endif
 #include "embedi_uart.h"
 
 #define CHANNEL_DATABUFF_LEN 4

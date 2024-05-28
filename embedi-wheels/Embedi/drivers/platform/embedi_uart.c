@@ -1,8 +1,5 @@
 #include "embedi_config.h"
 #include <stdio.h>
-#ifdef CFG_STM32F1XX
-#include "stm32f1xx_hal.h"
-#endif
 
 #define UART_BUFF_LEN 1
 #define UART_TIMEOUT 100
