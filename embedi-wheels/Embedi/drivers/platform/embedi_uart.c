@@ -1,5 +1,6 @@
 #include "embedi_config.h"
 #include <stdio.h>
+#include "embedi_module_init.h"
 
 #define UART_BUFF_LEN 1
 #define UART_TIMEOUT 100
@@ -34,7 +35,7 @@ UART_HandleTypeDef *huart = &huart3;
 
 void embedi_enable_uart1_interrupt(void)
 {
-    HAL_UART_Receive_IT(huart, uart1_buff, UART_BUFF_LEN);
+    HAL_UART_Receive_IT(huart, uart1_buff, UART_BUFF_LEN * sizeof(uint8_t));
 }
 
 void embedi_uart_send_byte(const uint8_t data)
@@ -74,7 +75,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     if (buff) {
         HAL_UART_Transmit(huart, buff, len, timeout);
         /* enable uart receive interrupt. keep it*/
-        HAL_UART_Receive_IT(huart, buff, len);
+        HAL_UART_Receive_IT(huart, buff, len * sizeof(uint8_t));
     }
 }
 
@@ -104,3 +105,11 @@ int fputc(int ch, FILE *f)
     return ch;
 }
 #endif /* CFG_UART_ENABLE */
+
+void embedi_uart_init(void)
+{
+#ifdef CFG_UART_ENABLE
+    embedi_enable_uart1_interrupt();
+#endif
+}
+platform_init(embedi_uart_init);

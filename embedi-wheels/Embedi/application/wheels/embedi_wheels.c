@@ -4,6 +4,7 @@
 #include "embedi_i2c.h"
 #include "embedi_imu.h"
 #include "embedi_kalman.h"
+#include "embedi_module_init.h"
 #include "embedi_motor.h"
 #include "embedi_pid.h"
 #include "embedi_scope.h"
@@ -100,29 +101,20 @@ void embedi_task_function(void const *argument)
     }
 }
 
-void embedi_init(void)
+void embedi_wheels_init(void)
 {
-    extern TIM_HandleTypeDef htim1;
-    extern TIM_HandleTypeDef htim2;
-    extern TIM_HandleTypeDef htim4;
-
     xSemaphore = xSemaphoreCreateBinary();
     osThreadDef(embedi_task, embedi_task_function, osPriorityNormal, 0, 512);
     _task_handle = osThreadCreate(osThread(embedi_task), NULL);
-
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
-#ifdef CFG_UART_ENABLE
-    embedi_enable_uart1_interrupt();
-#endif
-    embedi_imu_init();
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_12) {
-        xSemaphoreGiveFromISR(xSemaphore, NULL);
+        if (xSemaphore) {
+            xSemaphoreGiveFromISR(xSemaphore, NULL);
+        }
     }
 }
+
+app_init(embedi_wheels_init);

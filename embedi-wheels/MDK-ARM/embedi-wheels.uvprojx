@@ -684,6 +684,11 @@
               <FileType>1</FileType>
               <FilePath>..\Embedi\system\embedi_module_init.c</FilePath>
             </File>
+            <File>
+              <FileName>embedi_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\system\embedi_system.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

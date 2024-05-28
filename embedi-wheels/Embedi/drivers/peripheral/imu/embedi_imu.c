@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "embedi_config.h"
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
@@ -7,7 +8,6 @@
 #include "embedi_module_init.h"
 #include "embedi_scope.h"
 #include "embedi_test.h"
-#include <stdio.h>
 
 extern int run_test;
 static void _read_from_flash(void);
@@ -133,7 +133,6 @@ void embedi_imu_init(void)
     unsigned char accel_fsr;
     int result = 0;
 
-    embedi_module_init();
     result = embedi_imu_hardware_init(&int_param);
     if (result) {
         printf("Could not initialize imu.\n");
@@ -470,3 +469,4 @@ void embedi_get_roll_angle(float *angle)
 #endif
 #endif
 }
+driver_init(embedi_imu_init);

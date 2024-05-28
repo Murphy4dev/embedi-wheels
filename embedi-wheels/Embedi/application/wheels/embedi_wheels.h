@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void embedi_init(void);
+void embedi_wheels_init(void);
 
 #ifdef __cplusplus
 }

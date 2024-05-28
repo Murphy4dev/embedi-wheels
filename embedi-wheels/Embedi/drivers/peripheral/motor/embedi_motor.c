@@ -2,7 +2,7 @@
 #include "embedi_motor.h"
 #include "embedi_config.h"
 #include "embedi_test.h"
-
+#include "embedi_module_init.h"
 
 #define SPEED_DIRECTION (-1)     // 0 or -1
 #define RIGHT_LEFT_DIRECTION (1) // 0 or 1
@@ -111,3 +111,17 @@ void motor_test(void)
     embedi_set_direction(FORDWARD);
     embedi_motor_start(2000, 2000);
 }
+
+static void motor_init(void)
+{
+    extern TIM_HandleTypeDef htim1;
+    extern TIM_HandleTypeDef htim2;
+    extern TIM_HandleTypeDef htim4;
+
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
+    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+}
+
+driver_init(motor_init);

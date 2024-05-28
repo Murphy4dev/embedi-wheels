@@ -3,6 +3,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #endif
+#include "embedi_module_init.h"
 
 #ifdef CFG_TIMER_DELAY_ENABLE
 #if (CFG_DELAY_TIMER_INDEX == 1)
@@ -101,5 +102,4 @@ void embedi_get_systick(unsigned long *tick)
 #endif
 }
 
-
-#endif /*CFG_EMBEDI_DELAY_ENABLE*/
+#endif

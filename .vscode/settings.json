@@ -20,6 +20,7 @@
         "embedi_module_init.h": "c",
         "embedi_math.h": "c",
         "embedi_imu.h": "c",
-        "inv_mpu.h": "c"
+        "inv_mpu.h": "c",
+        "embedi_system.h": "c"
     }
 }
