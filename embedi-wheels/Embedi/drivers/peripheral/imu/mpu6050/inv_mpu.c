@@ -119,10 +119,6 @@ static inline int reg_int_cb(struct int_param_s *int_param)
 #define labs        abs
 #define fabs(x)     (((x)>0)?(x):-(x))
 #elif defined EMPL_TARGET_EMBEDI
-#include "embedi_config.h"
-#include "embedi_delay.h"
-#include "embedi_i2c.h"
-
 #define i2c_write   embedi_i2c_write_block
 #define i2c_read    embedi_i2c_read_block 
 #define delay_ms    embedi_delay_ms
@@ -642,6 +638,28 @@ static struct gyro_state_s st = {
 static int setup_compass(void);
 #define MAX_COMPASS_SAMPLE_RATE (100)
 #endif
+
+struct imu_operations inv_ops = {
+	.init = mpu_init,
+	.enable_sensor = mpu_set_sensors,
+	.configure_fifo = mpu_configure_fifo,
+	.set_sample_rate = mpu_set_sample_rate,
+    .get_sample_rate = mpu_get_sample_rate,
+	.set_gyro_fsr = mpu_set_gyro_fsr,
+    .set_accel_fsr = mpu_set_accel_fsr,
+	.get_gyro_fsr = mpu_get_gyro_fsr,
+	.get_accel_fsr = mpu_get_accel_fsr,
+	.read_gyro_data = mpu_get_gyro_reg,
+    .read_accel_data = mpu_get_accel_reg,
+    .get_gyro_sens = mpu_get_gyro_sens,
+    .get_accel_sens = mpu_get_accel_sens,
+};
+
+void inv_imu_init(void)
+{
+    embedi_register_operations(&inv_ops);
+}
+module_init(inv_imu_init);
 
 /**
  *  @brief      Enable/disable data ready interrupt.

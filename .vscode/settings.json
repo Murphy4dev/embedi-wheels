@@ -16,6 +16,10 @@
         "embedi_scope.h": "c",
         "embedi_kalman.h": "c",
         "embedi_pid.h": "c",
-        "embedi_test.h": "c"
+        "embedi_test.h": "c",
+        "embedi_module_init.h": "c",
+        "embedi_math.h": "c",
+        "embedi_imu.h": "c",
+        "inv_mpu.h": "c"
     }
 }

@@ -20,7 +20,11 @@
 
 #ifndef _INV_MPU_H_
 #define _INV_MPU_H_
-
+#include "embedi_config.h"
+#include "embedi_delay.h"
+#include "embedi_i2c.h"
+#include "embedi_imu.h"
+#include "embedi_module_init.h"
 #define EMPL_TARGET_EMBEDI
 #define MPU6050
 
@@ -30,23 +34,6 @@
 #define INV_XYZ_GYRO    (INV_X_GYRO | INV_Y_GYRO | INV_Z_GYRO)
 #define INV_XYZ_ACCEL   (0x08)
 #define INV_XYZ_COMPASS (0x01)
-
-struct int_param_s {
-#if defined EMPL_TARGET_MSP430 || defined MOTION_DRIVER_TARGET_MSP430
-    void (*cb)(void);
-    unsigned short pin;
-    unsigned char lp_exit;
-    unsigned char active_low;
-#elif defined EMPL_TARGET_UC3L0
-    unsigned long pin;
-    void (*cb)(volatile void*);
-    void *arg;
-#elif defined EMPL_TARGET_STM32F4
-    void (*cb)(void);
-#elif defined EMPL_TARGET_EMBEDI
-    void (*cb)(void);
-#endif
-};
 
 #define MPU_INT_STATUS_DATA_READY       (0x0001)
 #define MPU_INT_STATUS_DMP              (0x0002)
