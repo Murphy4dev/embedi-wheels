@@ -64,31 +64,39 @@ static void _wheels_control(void)
     embedi_motor_start((int)pwm, (int)pwm);
 }
 
+static void _idle_heart_beat(void)
+{
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+    osDelay(200);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    osDelay(200);
+}
+
 void embedi_task_function(void const *argument)
 {
     extern int run_test;
     // need to IMU systick
     embedi_imu_enable();
     for (;;) {
-#ifdef TEST_MODE
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-        osDelay(200);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-        osDelay(200);
-        motor_test();
-        emebedi_i2c_test();
-        embedi_imu_calibration();
-        embedi_flash_test();
-        run_test = 0;
-#else
         if (xSemaphoreTake(xSemaphore, 0) == pdTRUE) {
-            if (run_test == MOTOR_START_FORDWARD) {
+            switch (run_test) {
+            case MOTOR_START_FORDWARD:
                 _wheels_control();
-            } else {
-                embedi_motor_sotp();
+                break;
+            case IMU_CALIBRATION: {
+                int data_ready = 0;
+                data_ready = embedi_update_imu_data_buff();
+                if (data_ready) {
+                    embedi_imu_calibration();
+                    run_test = _DEFAULT;
+                }
+                break;
+            }
+            default:
+                _idle_heart_beat();
+                break;
             }
         }
-#endif
     }
 }
 

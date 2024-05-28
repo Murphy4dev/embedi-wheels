@@ -3,7 +3,7 @@
 
 enum {
     /* 0 */
-    MOTOR_STOP = 48, // scall
+    _DEFAULT = 48, // scall
     /* 1 */
     MOTOR_START_FORDWARD = 49,
     /* 2 */
@@ -11,9 +11,9 @@ enum {
     /* 3 */
     IMU_CALIBRATION = 51,
     /* 4 */
-    IMU_FLASH_WRITE = 52,
+    RESERVE1 = 52,
     /* 5 */
-    IMU_FLASH_READ = 53,
+    RESERVE2 = 53,
     /* 6 */
     FLASH_WRITE = 54,
     /* 7 */

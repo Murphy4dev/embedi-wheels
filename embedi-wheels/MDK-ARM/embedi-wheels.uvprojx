@@ -362,7 +362,7 @@
               <MiscControls />
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine />
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Embedi/Inc;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3;../Embedi/include;../Embedi/algorithms/include;../Embedi/drivers/peripheral/include;../Embedi/drivers/platform/include;../Embedi/utils/include;../Embedi/application/wheels;../Embedi/drivers/peripheral/imu/mpu6050</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -596,69 +596,69 @@
           <GroupName>Embedi</GroupName>
           <Files>
             <File>
-              <FileName>embedi_delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_uart.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_imu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\imu\embedi_imu.c</FilePath>
-            </File>
-            <File>
-              <FileName>inv_mpu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\imu\inv_mpu.c</FilePath>
-            </File>
-            <File>
-              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\imu\inv_mpu_dmp_motion_driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_motor.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_scope.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_scope.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_wheels.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_wheels.c</FilePath>
-            </File>
-            <File>
-              <FileName>embedi_pid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\embedi_pid.c</FilePath>
-            </File>
-            <File>
               <FileName>embedi_kalman.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\imu\embedi_kalman.c</FilePath>
+              <FilePath>..\Embedi\algorithms\kalman\embedi_kalman.c</FilePath>
             </File>
             <File>
               <FileName>embedi_math.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Embedi\Src\imu\embedi_math.c</FilePath>
+              <FilePath>..\Embedi\algorithms\math\embedi_math.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\algorithms\pid\embedi_pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_wheels.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\application\wheels\embedi_wheels.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_imu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\peripheral\imu\embedi_imu.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\peripheral\imu\mpu6050\inv_mpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>inv_mpu_dmp_motion_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\peripheral\imu\mpu6050\inv_mpu_dmp_motion_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\peripheral\motor\embedi_motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\platform\embedi_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\platform\embedi_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\platform\embedi_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\drivers\platform\embedi_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>embedi_scope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Embedi\utils\embedi_scope.c</FilePath>
             </File>
           </Files>
         </Group>

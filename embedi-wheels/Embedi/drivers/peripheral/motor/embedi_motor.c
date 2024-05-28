@@ -111,13 +111,6 @@ duty(%) =  = TIM3->CCR2 / ARR(Auto Reload Register)
 */
 void motor_test(void)
 {
-    if (run_test == MOTOR_START_BACKWARD) { // 2 scall
-        embedi_set_direction(BACKWARD);
-        embedi_motor_start(2000, 2000);
-    } else if (run_test == MOTOR_START_FORDWARD) { // 1 scall
-        embedi_set_direction(FORDWARD);
-        embedi_motor_start(2000, 2000);
-    } else if (run_test == MOTOR_STOP) { // 0 scall
-        embedi_motor_sotp();
-    }
+    embedi_set_direction(FORDWARD);
+    embedi_motor_start(2000, 2000);
 }

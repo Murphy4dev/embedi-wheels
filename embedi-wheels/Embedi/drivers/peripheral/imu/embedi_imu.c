@@ -204,7 +204,7 @@ static void _accel_data_standardize(long *data, float *accel)
     embedi_scope_show();
 #endif
 #else
-    // printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
+    printf("accel data %f %f %f \n", accel[0], accel[1], accel[2]);
 #endif
 }
 
@@ -283,25 +283,23 @@ static void _write_to_flash(void)
 
     uint8_t len = sizeof(write_data._buf) / 2 + ((sizeof(write_data._buf) % 2) ? 1 : 0);
 
-    if (run_test == IMU_FLASH_WRITE) {
-        printf("write %d %d %d %d %d %d len: %d\n",
-               write_data.bias.accel.x_bias,
-               write_data.bias.accel.y_bias,
-               write_data.bias.accel.z_bias,
-               write_data.bias.gyro.x_bias,
-               write_data.bias.gyro.y_bias,
-               write_data.bias.gyro.z_bias, len);
-        embedi_write_flash(IMU_ADDR, (uint16_t *)write_data._buf, len);
-    } else if (run_test == IMU_FLASH_READ) {
-        embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
-        printf("read %d %d %d %d %d %d len: %d\n",
-               read_data.bias.accel.x_bias,
-               read_data.bias.accel.y_bias,
-               read_data.bias.accel.z_bias,
-               read_data.bias.gyro.x_bias,
-               read_data.bias.gyro.y_bias,
-               read_data.bias.gyro.z_bias, len);
-    }
+    printf("write %d %d %d %d %d %d len: %d\n",
+           write_data.bias.accel.x_bias,
+           write_data.bias.accel.y_bias,
+           write_data.bias.accel.z_bias,
+           write_data.bias.gyro.x_bias,
+           write_data.bias.gyro.y_bias,
+           write_data.bias.gyro.z_bias, len);
+    embedi_write_flash(IMU_ADDR, (uint16_t *)write_data._buf, len);
+
+    embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+    printf("read %d %d %d %d %d %d len: %d\n",
+           read_data.bias.accel.x_bias,
+           read_data.bias.accel.y_bias,
+           read_data.bias.accel.z_bias,
+           read_data.bias.gyro.x_bias,
+           read_data.bias.gyro.y_bias,
+           read_data.bias.gyro.z_bias, len);
 }
 
 void embedi_imu_calibration(void)
@@ -347,6 +345,16 @@ void embedi_get_gyro_data(float *gyro_data)
     _gyro_data_standardize(data, gyro_data);
 }
 
+int embedi_update_imu_data_buff(void)
+{
+    float accel[3];
+    float gyro[3];
+
+    embedi_get_accel_data(accel);
+    embedi_get_gyro_data(gyro);
+
+    return (gyro_cali_ready && accel_cali_ready);
+}
 void embedi_get_roll_angle(float *angle)
 {
     struct matrix *m;

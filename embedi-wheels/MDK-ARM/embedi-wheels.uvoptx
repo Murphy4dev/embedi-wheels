@@ -177,24 +177,7 @@
           <Name>-U-O142 -O2254 -S0 -C0 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_128 -FS08000000 -FL010000 -FP0($$Device:STM32F103C8$Flash\STM32F10x_128.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>316</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\Embedi\Src\imu\embedi_imu.c</Filename>
-          <ExecCommand />
-          <Expression />
-        </Bp>
-      </Breakpoint>
+      <Breakpoint />
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
@@ -541,8 +524,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_delay.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_delay.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\algorithms\kalman\embedi_kalman.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_kalman.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -554,8 +537,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_uart.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_uart.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\algorithms\math\embedi_math.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_math.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -567,8 +550,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_i2c.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_i2c.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\algorithms\pid\embedi_pid.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_pid.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -580,8 +563,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\imu\embedi_imu.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_imu.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\application\wheels\embedi_wheels.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_wheels.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -593,8 +576,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\imu\inv_mpu.c</PathWithFileName>
-      <FilenameWithoutPath>inv_mpu.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\peripheral\imu\embedi_imu.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_imu.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -606,8 +589,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\imu\inv_mpu_dmp_motion_driver.c</PathWithFileName>
-      <FilenameWithoutPath>inv_mpu_dmp_motion_driver.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\peripheral\imu\mpu6050\inv_mpu.c</PathWithFileName>
+      <FilenameWithoutPath>inv_mpu.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -619,8 +602,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_motor.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_motor.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\peripheral\imu\mpu6050\inv_mpu_dmp_motion_driver.c</PathWithFileName>
+      <FilenameWithoutPath>inv_mpu_dmp_motion_driver.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -632,8 +615,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_flash.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_flash.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\peripheral\motor\embedi_motor.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_motor.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -645,8 +628,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_scope.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_scope.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\platform\embedi_delay.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_delay.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -658,8 +641,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_wheels.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_wheels.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\platform\embedi_flash.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -671,8 +654,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\embedi_pid.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_pid.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\platform\embedi_i2c.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_i2c.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -684,8 +667,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\imu\embedi_kalman.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_kalman.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\drivers\platform\embedi_uart.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_uart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -697,8 +680,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\Embedi\Src\imu\embedi_math.c</PathWithFileName>
-      <FilenameWithoutPath>embedi_math.c</FilenameWithoutPath>
+      <PathWithFileName>..\Embedi\utils\embedi_scope.c</PathWithFileName>
+      <FilenameWithoutPath>embedi_scope.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
