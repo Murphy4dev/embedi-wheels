@@ -1,7 +1,7 @@
+#include "embedi_pid.h"
+#include "embedi_config.h"
 #include <stdio.h>
 #include <string.h>
-#include "embedi_config.h"
-#include "embedi_pid.h"
 
 void embedi_pid_init(struct _pid *pid, int t, int p, int i, int d)
 {
@@ -14,6 +14,9 @@ void embedi_pid_init(struct _pid *pid, int t, int p, int i, int d)
     pid->P = p;
     pid->I = i;
     pid->D = d;
+    pid->e_k = 0;
+    pid->e_k_1 = 0;
+    pid->e.e_k_2 = 0;
     pid->target = t;
     pid->inited = 1;
 }
@@ -31,9 +34,10 @@ float embedi_pid(struct _pid *pid, float current)
     pid->e.e_sum += pid->e_k;
 
     data = pid->P * (pid->e_k) +
-            pid->I * (pid->e.e_sum) +
-            pid->D * (pid->e_k - pid->e_k_1);
-    printf("data %d e_k %d w %d \n", (int)data,  (int)(pid->e_k*1000), (int)((pid->e_k - pid->e_k_1)*1000));
+           pid->I * (pid->e.e_sum) +
+           pid->D * (pid->e_k - pid->e_k_1);
+    // printf("data %d e_k %d w %d \n", (int)data,
+    //        (int)(pid->e_k * 1000), (int)((pid->e_k - pid->e_k_1) * 1000));
 
     return data;
 }
