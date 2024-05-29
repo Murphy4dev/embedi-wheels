@@ -17,6 +17,7 @@ void embedi_print_matrix(struct matrix *m);
 void embedi_create_matrix(struct matrix *m,  unsigned char row,  unsigned char colum);
 void embedi_create_eye_matrix(struct matrix *m, unsigned char row, unsigned char colum);
 void embedi_reset_matrix(struct matrix *m);
+void embedi_copy_matrix(struct matrix *from, struct matrix *to);
 void embedi_matrix_add(struct matrix *a, struct matrix *b, struct matrix *r);
 void embedi_matrix_minus(struct matrix *a, struct matrix *b, struct matrix *r);
 void embedi_matrix_mul(struct matrix *a, struct matrix *b, struct matrix *r);
@@ -27,6 +28,7 @@ void embedi_matrix_3x3_inv(struct matrix *a, struct matrix *inv);
 void embedi_matrix_test(void);
 
 float embedi_arctan(float x);
+float embedi_arcsin(float x);
 
 #ifdef __cplusplus
 }

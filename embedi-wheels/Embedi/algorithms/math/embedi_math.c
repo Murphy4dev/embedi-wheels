@@ -11,7 +11,8 @@ void embedi_print_matrix(struct matrix *m)
 
     for (int i = 0; i < m->row; i++) {
         for (int j = 0; j < m->colum; j++) {
-                printf("%d ", (int)(m->matrix[i][j] * 1000));
+            //printf("%d ", (int)(m->matrix[i][j] * 1000));
+            printf("%f ", m->matrix[i][j]);
         }
         printf("\n");
     }
@@ -47,6 +48,22 @@ void embedi_reset_matrix(struct matrix *m)
     }
     m->row = 0;
     m->colum = 0;
+}
+
+void embedi_copy_matrix(struct matrix *from, struct matrix *to)
+{
+    if (!from || !to ||
+        from->colum != to->colum ||
+        from->row != to->row) {
+        printf("copy para invalid \n");
+        return;
+    }
+
+    for (int i = 0; i < to->row; i++) {
+        for (int j = 0; j < to->colum; j++) {
+            to->matrix[i][j] = from->matrix[i][j];
+        }
+    }
 }
 
 void embedi_create_eye_matrix(struct matrix *m, unsigned char row, unsigned char colum)
@@ -321,6 +338,14 @@ void embedi_matrix_test(void)
 float embedi_arctan(float x)
 {
     float talor_r = x - (x * x * x / 3) + (x * x * x * x * x) / 5;
+
+    return talor_r;
+}
+
+/* taylor expansion arcsin = x + x^3/6  + 3*x^5/100 */
+float embedi_arcsin(float x)
+{
+    float talor_r = x - (x * x * x / 6) + 3*(x * x * x * x * x) / 40;
 
     return talor_r;
 }

@@ -21,6 +21,8 @@
         "embedi_math.h": "c",
         "embedi_imu.h": "c",
         "inv_mpu.h": "c",
-        "embedi_system.h": "c"
+        "embedi_system.h": "c",
+        "embedi_6d_kalman.h": "c",
+        "embedi_2d_kalman.h": "c"
     }
 }

@@ -30,6 +30,7 @@ extern "C" {
 #define ACCEL_DATA_SHOW 0
 #define GRYO_DATA_SHOW 0
 #define ROLL_ANGLE_SHOW 0
+#define EULER_ANGLE_SHOW 0
 #define VELOCITY_DATA_SHOW 1
 
 #ifdef __cplusplus

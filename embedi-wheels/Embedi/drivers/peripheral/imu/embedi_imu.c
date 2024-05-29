@@ -1,13 +1,15 @@
-#include <stdio.h>
+#include "embedi_imu.h"
+#include "embedi_2d_kalman.h"
+#include "embedi_6d_kalman.h"
 #include "embedi_config.h"
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
-#include "embedi_kalman.h"
 #include "embedi_math.h"
-#include "embedi_imu.h"
 #include "embedi_module_init.h"
 #include "embedi_scope.h"
 #include "embedi_test.h"
+#include <math.h>
+#include <stdio.h>
 
 extern int run_test;
 static void _read_from_flash(void);
@@ -153,7 +155,8 @@ void embedi_imu_init(void)
     _read_from_flash();
 
     embedi_enable_sensor(0);
-    embedi_kalman_init();
+    // embedi_2d_kalman_init();
+    embedi_6d_kalman_init();
 }
 
 void embedi_imu_enable(void)
@@ -439,6 +442,7 @@ int embedi_update_imu_data_buff(void)
 
     return (g_chip.gyro_cali_ready && g_chip.accel_cali_ready);
 }
+
 void embedi_get_roll_angle(float *angle)
 {
     struct matrix *m;
@@ -450,8 +454,8 @@ void embedi_get_roll_angle(float *angle)
     embedi_get_gyro_data(gyro);
     accel_angle = embedi_arctan(accel[1] / accel[2]);
 
-    embedi_kalman_filter(accel_angle, gyro[0]);
-    m = emebedi_get_kalman_estimation();
+    embedi_2d_kalman_filter(accel_angle, gyro[0]);
+    m = emebedi_get_2d_kalman_obsever();
     *angle = m->matrix[0][0] * ANGLE_DIRECTION;
 
 #ifdef CFG_IMU_DATA_SCOPE_SHOW
@@ -469,4 +473,78 @@ void embedi_get_roll_angle(float *angle)
 #endif
 #endif
 }
+/*
+    angle[0] = roll
+    angle[1] = pitch
+    angle[2] = yaw
+*/
+void embedi_get_euler_angle(float *angle)
+{
+    struct matrix *m;
+    float accel[3];
+    float gyro[3];
+
+    if (!angle) {
+        printf("angle null \n");
+        return;
+    }
+
+    embedi_get_accel_data(accel);
+    embedi_get_gyro_data(gyro);
+
+    embedi_6d_kalman_filter(accel, gyro);
+    m = emebedi_get_6d_kalman_obsever();
+    // embedi_print_matrix(m);
+    float q0 = m->matrix[0][0];
+    float q1 = m->matrix[1][0];
+    float q2 = m->matrix[2][0];
+    float q3 = m->matrix[3][0];
+    angle[0] = -atan(2 * (q2 * q3 + q0 * q1) / (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3));
+    angle[1] = asin(2 * (q1 * q3 - q0 * q2));
+    angle[2] = atan(2 * (q1 * q2 + q0 * q3) / (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3));
+
+#ifdef CFG_IMU_DATA_SCOPE_SHOW
+#if (EULER_ANGLE_SHOW == 1)
+#if 0
+    struct matrix rot;
+    struct matrix fusion_accel;
+    struct matrix vector;
+
+    embedi_create_matrix(&fusion_accel, 3, 1);
+    embedi_create_matrix(&vector, 3, 1);
+    vector.matrix[0][0] = 0;
+    vector.matrix[1][0] = 0;
+    vector.matrix[2][0] = 1;
+    embedi_create_matrix(&rot, 3, 3);
+    embedi_quat_to_rot(&rot);
+    // fusion_accel = vector([0 0 9.8]) * rot
+    embedi_matrix_mul(&rot, &vector, &fusion_accel);
+
+    embedi_data_to_scope(accel[0] * 10, CHANNEL_1);
+    embedi_data_to_scope(-fusion_accel.matrix[0][0] * 10, CHANNEL_2);
+    embedi_data_to_scope(accel[1] * 10, CHANNEL_3);
+    embedi_data_to_scope(-fusion_accel.matrix[1][0] * 10, CHANNEL_4);
+    embedi_data_to_scope(accel[2] * 10, CHANNEL_5);
+    embedi_data_to_scope(fusion_accel.matrix[2][0] * 10, CHANNEL_6);
+#endif
+    //embedi_data_to_scope(angle[0] * rad2deg, CHANNEL_1);
+    //embedi_data_to_scope(angle[1] * rad2deg, CHANNEL_2);
+    //embedi_data_to_scope(angle[2] * rad2deg, CHANNEL_3);
+    //embedi_scope_show();
+    // printf("quat: %f %f %f %f\n", q0, q1, q2, q3);
+    printf("angle: %f %f %f\n",
+        angle[0] * rad2deg,
+        angle[1] * rad2deg, 
+        angle[2] * rad2deg);
+#endif
+#else
+#if 0
+    printf("angle: %f %f %f\n",
+        angle[0] * rad2deg,
+        angle[1] * rad2deg, 
+        angle[2] * rad2deg);
+#endif
+#endif
+}
+
 driver_init(embedi_imu_init);

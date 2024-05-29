@@ -161,18 +161,18 @@ static void _update(float accel_angle)
     // printf("_update step5\n");
 }
 
-void embedi_kalman_filter(float accel_angle, float gyro)
+void embedi_2d_kalman_filter(float accel_angle, float gyro)
 {
     _predect(gyro);
     _update(accel_angle);
 }
 
-struct matrix *emebedi_get_kalman_estimation(void)
+struct matrix *emebedi_get_2d_kalman_obsever(void)
 {
     return &observer;
 }
 
-void embedi_kalman_init(void)
+void embedi_2d_kalman_init(void)
 {
     filter.dt = KALMAN_DT;
 

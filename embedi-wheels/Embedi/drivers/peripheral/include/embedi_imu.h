@@ -20,6 +20,7 @@
 #define GYRO_TARGET 0
 #define CALI_DATA_LEN 20
 #define ANGLE_DIRECTION (-1) // 1 or -1
+#define rad2deg (57.2957) //180/pi
 
 struct int_param_s {
     void (*cb)(void);

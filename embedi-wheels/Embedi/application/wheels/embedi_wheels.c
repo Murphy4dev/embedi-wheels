@@ -3,7 +3,8 @@
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
 #include "embedi_imu.h"
-#include "embedi_kalman.h"
+#include "embedi_2d_kalman.h"
+#include "embedi_6d_kalman.h"
 #include "embedi_module_init.h"
 #include "embedi_motor.h"
 #include "embedi_pid.h"
@@ -16,6 +17,7 @@
 #endif
 
 // #define TEST_MODE
+ #define USE_6D_ALGO
 /* banlance*/
 #define BALANCE_P (10000)
 #define BALANCE_D (500)
@@ -32,7 +34,10 @@ static void _wheels_control(void)
 {
     int r_speed = 0;
     int l_speed = 0;
-    float angle = 0.0;
+#ifndef USE_6D_ALGO
+    float angle;
+#endif
+    float euler_angle[3];
     float pwm = 0;
     struct _pid balance_pd;
     float balance_pwm = 0;
@@ -40,10 +45,14 @@ static void _wheels_control(void)
     float velocity_pwm = 0;
     embedi_pid_init(&balance_pd, BALANCE_T, BALANCE_P, 0, BALANCE_D);
     embedi_pid_init(&velocity_pi, VELOCITY_T, VELOCITY_P, VELOCITY_I, 0);
+#ifndef USE_6D_ALGO
     embedi_get_roll_angle(&angle);
+#else
+    embedi_get_euler_angle(euler_angle);
+#endif
     embedi_get_speed(&r_speed, &l_speed);
 
-    balance_pwm = embedi_pid(&balance_pd, angle);
+    balance_pwm = embedi_pid(&balance_pd, euler_angle[0]);
     velocity_pwm += embedi_delta_pid(&velocity_pi, (r_speed + l_speed) / 2);
     pwm = balance_pwm + velocity_pwm;
 #ifdef CFG_IMU_DATA_SCOPE_SHOW

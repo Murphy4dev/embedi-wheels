@@ -3,7 +3,7 @@
 #include "embedi_uart.h"
 
 #define CHANNEL_DATABUFF_LEN 4
-#define CHANNEL_NUM 3
+#define CHANNEL_NUM 6
 #define BUFF_LEN (CHANNEL_NUM * 4 + 2)
 unsigned char g_buffer[BUFF_LEN];
 
