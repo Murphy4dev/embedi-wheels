@@ -17,4 +17,5 @@ struct _pid {
 void embedi_pid_init(struct _pid *pid, int t, int p, int i, int d);
 float embedi_pid(struct _pid *pid, float current);
 float embedi_delta_pid(struct _pid *pid, float current);
+void embedi_change_pid_target(struct _pid *pid, int t);
 #endif

@@ -21,6 +21,15 @@ void embedi_pid_init(struct _pid *pid, int t, int p, int i, int d)
     pid->inited = 1;
 }
 
+void embedi_change_pid_target(struct _pid *pid, int t)
+{
+    if (!pid) {
+        printf("pid null \n");
+        return;
+    }
+    pid->target = t;
+}
+
 float embedi_pid(struct _pid *pid, float current)
 {
     float data = 0;

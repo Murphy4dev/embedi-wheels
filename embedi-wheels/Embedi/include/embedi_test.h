@@ -5,9 +5,9 @@ enum {
     /* 0 */
     _DEFAULT = 48, // scall
     /* 1 */
-    MOTOR_START_FORDWARD = 49,
+    _START = 49,
     /* 2 */
-    MOTOR_START_BACKWARD = 50,
+    _STOP = 50,
     /* 3 */
     IMU_CALIBRATION = 51,
     /* 4 */

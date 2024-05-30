@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "embedi_delay.h"
 #include "embedi_i2c.h"
+#include "embedi_system.h"
 /*
 when there is external pull-up R(Recomanded)
 GPIO mode configuration
@@ -373,13 +374,12 @@ int embedi_i2c_write_block(uint8_t addr, uint8_t reg, uint8_t len, uint8_t *data
 #endif
 }
 
-extern int run_test;
 void emebedi_i2c_test(void)
 {
     int ret = 0;
     uint8_t data = 0;
 
-    if (run_test) {
+    if (embedi_get_run_state()) {
         ret = embedi_i2c_read_block(0xD0, 0x75, 1, &data);
         printf("%d 0x%x\r\n", ret, data);
     }

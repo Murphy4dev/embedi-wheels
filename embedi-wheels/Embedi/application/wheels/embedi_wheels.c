@@ -1,14 +1,15 @@
 #include "cmsis_os.h"
+#include "embedi_2d_kalman.h"
+#include "embedi_6d_kalman.h"
 #include "embedi_delay.h"
 #include "embedi_flash.h"
 #include "embedi_i2c.h"
 #include "embedi_imu.h"
-#include "embedi_2d_kalman.h"
-#include "embedi_6d_kalman.h"
 #include "embedi_module_init.h"
 #include "embedi_motor.h"
 #include "embedi_pid.h"
 #include "embedi_scope.h"
+#include "embedi_system.h"
 #include "embedi_test.h"
 #include "main.h"
 #include <stdio.h>
@@ -17,14 +18,14 @@
 #endif
 
 // #define TEST_MODE
- #define USE_6D_ALGO
+#define USE_6D_ALGO
 /* banlance*/
-#define BALANCE_P (10000)
-#define BALANCE_D (500)
+#define BALANCE_P (25000)
+#define BALANCE_D (5000)
 #define BALANCE_T (0)
 /* banlance*/
-#define VELOCITY_P (100)
-#define VELOCITY_I (30)
+#define VELOCITY_P (0)
+#define VELOCITY_I (0)
 #define VELOCITY_T (0)
 osThreadId _task_handle;
 void embedi_task(void const *argument);
@@ -52,8 +53,8 @@ static void _wheels_control(void)
 #endif
     embedi_get_speed(&r_speed, &l_speed);
 
-    balance_pwm = embedi_pid(&balance_pd, euler_angle[0]);
-    velocity_pwm += embedi_delta_pid(&velocity_pi, (r_speed + l_speed) / 2);
+    balance_pwm = -embedi_pid(&balance_pd, euler_angle[0]);
+    velocity_pwm = -embedi_pid(&velocity_pi, (r_speed + l_speed) / 2);
     pwm = balance_pwm + velocity_pwm;
 #ifdef CFG_IMU_DATA_SCOPE_SHOW
 #if (VELOCITY_DATA_SHOW == 1)
@@ -66,7 +67,7 @@ static void _wheels_control(void)
 #endif
 #endif
 
-    if (pwm < 0) {
+    if (pwm > 0) {
         embedi_set_direction(FORDWARD);
     } else {
         embedi_set_direction(BACKWARD);
@@ -84,13 +85,12 @@ static void _idle_heart_beat(void)
 
 void embedi_task_function(void const *argument)
 {
-    extern int run_test;
     // need to IMU systick
     embedi_imu_enable();
     for (;;) {
         if (xSemaphoreTake(xSemaphore, 0) == pdTRUE) {
-            switch (run_test) {
-            case MOTOR_START_FORDWARD:
+            switch (embedi_get_run_state()) {
+            case _START:
                 _wheels_control();
                 break;
             case IMU_CALIBRATION: {
@@ -98,12 +98,13 @@ void embedi_task_function(void const *argument)
                 data_ready = embedi_update_imu_data_buff();
                 if (data_ready) {
                     embedi_imu_calibration();
-                    run_test = _DEFAULT;
+                    embedi_set_run_state(_DEFAULT);
                 }
                 break;
             }
             default:
                 _idle_heart_beat();
+                embedi_motor_sotp();
                 break;
             }
         }
@@ -119,10 +120,13 @@ void embedi_wheels_init(void)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == GPIO_PIN_12) {
+    if (GPIO_Pin == MPU6050_INT_Pin) {
         if (xSemaphore) {
             xSemaphoreGiveFromISR(xSemaphore, NULL);
         }
+    } else if (GPIO_Pin == KEY_Pin) {
+        printf("START key press \n");
+        embedi_set_run_state(_START);
     }
 }
 

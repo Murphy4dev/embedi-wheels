@@ -8,10 +8,10 @@
 #include "embedi_module_init.h"
 #include "embedi_scope.h"
 #include "embedi_test.h"
+#include "embedi_system.h"
 #include <math.h>
 #include <stdio.h>
 
-extern int run_test;
 static void _read_from_flash(void);
 static struct imu_chip g_chip;
 
@@ -391,7 +391,7 @@ static void _write_to_flash(void)
 
 void embedi_imu_calibration(void)
 {
-    if (run_test == IMU_CALIBRATION) { // 3 scall
+    if (embedi_get_run_state() == IMU_CALIBRATION) { // 3 scall
         _accel_callibratin();
         _gyro_callibratin();
     }

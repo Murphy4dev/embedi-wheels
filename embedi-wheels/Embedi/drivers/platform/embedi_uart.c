@@ -55,8 +55,7 @@ void embedi_uart_send_byte(const uint8_t data)
     uart->DR = data;
 }
 
-int run_test = 0;
-
+#include "embedi_system.h"
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     uint8_t *buff = NULL;
@@ -71,7 +70,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         buff = uart3_buff;
     }
     /* do something*/
-    run_test = buff[0];
+    embedi_set_run_state(buff[0]);
     if (buff) {
         HAL_UART_Transmit(huart, buff, len, timeout);
         /* enable uart receive interrupt. keep it*/

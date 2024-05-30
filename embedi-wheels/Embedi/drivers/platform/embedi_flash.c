@@ -2,6 +2,7 @@
 #include "embedi_config.h"
 #include "embedi_flash.h"
 #include "embedi_test.h"
+#include "embedi_system.h"
 
 static uint16_t _read_data(uint32_t addr)
 {
@@ -96,18 +97,17 @@ void embedi_write_flash(uint32_t addr, uint16_t *buf, uint16_t len)
     HAL_FLASH_Lock();
 }
 
-extern int run_test;
 void embedi_flash_test(void)
 {
     uint8_t write_buf[] = {"10123456789"};
     uint8_t read_buf[12];
     uint8_t len = sizeof(write_buf) / 2 + ((sizeof(write_buf) % 2) ? 1 : 0);
 
-    if (run_test == FLASH_WRITE) {
-        printf("write %s %d %d \n", write_buf, len, run_test);
+    if (embedi_get_run_state() == FLASH_WRITE) {
+        printf("write %s %d %d \n", write_buf, len, embedi_get_run_state());
         embedi_write_flash(IMU_ADDR, (uint16_t *)write_buf, len);
-    } else if (run_test == FLASH_READ) {
+    } else if (embedi_get_run_state() == FLASH_READ) {
         embedi_read_flash(IMU_ADDR, (uint16_t *)read_buf, len);
-        printf("read %s %d %d \n", read_buf, len, run_test);
+        printf("read %s %d %d \n", read_buf, len, embedi_get_run_state());
     }
 }

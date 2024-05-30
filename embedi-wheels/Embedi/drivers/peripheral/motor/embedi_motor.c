@@ -1,13 +1,12 @@
-#include <stdio.h>
 #include "embedi_motor.h"
 #include "embedi_config.h"
-#include "embedi_test.h"
 #include "embedi_module_init.h"
+#include "embedi_test.h"
+#include <stdio.h>
 
 #define SPEED_DIRECTION (-1)     // 0 or -1
 #define RIGHT_LEFT_DIRECTION (1) // 0 or 1
-#define MAX_DUTY 7199
-extern int run_test;
+#define MAX_DUTY 4199
 
 static int _read_encoder(int tim)
 {
@@ -80,12 +79,29 @@ void embedi_set_direction(enum embedi_direction dir)
 
 void embedi_motor_start(int left, int right)
 {
+    int force_stop = 0;
+
     if (left > MAX_DUTY) {
         left = MAX_DUTY;
+        force_stop = 1;
+    } else if (left < -MAX_DUTY) {
+        left = -MAX_DUTY;
+        force_stop = 1;
     }
+
     if (right > MAX_DUTY) {
         right = MAX_DUTY;
+        force_stop = 1;
+    } else if (right < -MAX_DUTY) {
+        right = -MAX_DUTY;
+        force_stop = 1;
     }
+
+    if (force_stop) {
+        _set_pwm(0, 0);
+        return;
+    }
+
     if (RIGHT_LEFT_DIRECTION) {
         _set_pwm(left, right);
     } else {
