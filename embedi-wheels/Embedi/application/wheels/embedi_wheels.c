@@ -170,7 +170,6 @@ void timer_function(void const *argument)
     if (xSemaphore) {
         xSemaphoreGiveFromISR(xSemaphore, NULL);
     }
-    printf("5ms timer \n");
 }
 
 void embedi_wheels_init(void)
@@ -182,7 +181,7 @@ void embedi_wheels_init(void)
     embedi_pid_init(&velocity_pi, VELOCITY_T, VELOCITY_P, VELOCITY_I, VELOCITY_D);
 
     xSemaphore = xSemaphoreCreateBinary();
-    osThreadDef(embedi_task, embedi_task_function, osPriorityNormal, 0, 512);
+    osThreadDef(embedi_task, embedi_task_function, osPriorityBelowNormal, 0, 512);
     _task_handle = osThreadCreate(osThread(embedi_task), NULL);
 
     if (!IMU_IRQ_GPIO) {
