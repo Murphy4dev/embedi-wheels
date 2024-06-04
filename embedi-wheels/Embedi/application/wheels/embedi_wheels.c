@@ -19,17 +19,47 @@
 
 // #define TEST_MODE
 #define USE_6D_ALGO
+#define rad2deg (57.2957)
 /* banlance*/
-#define BALANCE_P (25000)
-#define BALANCE_D (5000)
-#define BALANCE_T (0)
+#define BALANCE_P (600 * rad2deg)
+#define BALANCE_D (10 * rad2deg)
+#define BALANCE_T (1.75 / rad2deg)
 /* banlance*/
-#define VELOCITY_P (0)
-#define VELOCITY_I (0)
+#define VELOCITY_P (80) // 25.0
+#define VELOCITY_I (4)  // 3.25
+#define VELOCITY_D (0)
+#define VELOCITY_LIMIT (10000) // 3.25
 #define VELOCITY_T (0)
 osThreadId _task_handle;
 void embedi_task(void const *argument);
 SemaphoreHandle_t xSemaphore = NULL;
+
+static struct _pid balance_pd;
+static struct _pid velocity_pi;
+static float balance_pwm = 0;
+static float velocity_pwm = 0;
+static float velocity = 0;
+static float velocity_last = 0;
+static float abnormal_protect = 0;
+
+static void _reset_parameters(void)
+{
+    balance_pwm = 0;
+    velocity_pwm = 0;
+    velocity = 0;
+    velocity_last = 0;
+    abnormal_protect = 0;
+    embedi_pid_reset(&balance_pd);
+    embedi_pid_reset(&velocity_pi);
+}
+
+static void abnormal_check(void)
+{
+    if (velocity > 50 || velocity < -50) {
+        embedi_motor_sotp();
+        abnormal_protect = 1;
+    }
+}
 
 static void _wheels_control(void)
 {
@@ -37,24 +67,24 @@ static void _wheels_control(void)
     int l_speed = 0;
 #ifndef USE_6D_ALGO
     float angle;
-#endif
+#else
     float euler_angle[3];
+#endif
     float pwm = 0;
-    struct _pid balance_pd;
-    float balance_pwm = 0;
-    struct _pid velocity_pi;
-    float velocity_pwm = 0;
-    embedi_pid_init(&balance_pd, BALANCE_T, BALANCE_P, 0, BALANCE_D);
-    embedi_pid_init(&velocity_pi, VELOCITY_T, VELOCITY_P, VELOCITY_I, 0);
 #ifndef USE_6D_ALGO
     embedi_get_roll_angle(&angle);
+    balance_pwm = -embedi_pid(&balance_pd, angle);
 #else
     embedi_get_euler_angle(euler_angle);
+    balance_pwm = -embedi_pid(&balance_pd, euler_angle[0], 0);
 #endif
     embedi_get_speed(&r_speed, &l_speed);
+    // lowpass filter
+    velocity_last = velocity;
+    velocity = r_speed + l_speed;
+    velocity = velocity_last * 0.86 + velocity * 0.14;
 
-    balance_pwm = -embedi_pid(&balance_pd, euler_angle[0]);
-    velocity_pwm = -embedi_pid(&velocity_pi, (r_speed + l_speed) / 2);
+    velocity_pwm = -embedi_pid(&velocity_pi, velocity, VELOCITY_LIMIT);
     pwm = balance_pwm + velocity_pwm;
 #ifdef CFG_IMU_DATA_SCOPE_SHOW
 #if (VELOCITY_DATA_SHOW == 1)
@@ -63,16 +93,18 @@ static void _wheels_control(void)
     // embedi_data_to_scope(velocity_pwm, CHANNEL_3);
     // embedi_data_to_scope((r_speed + l_speed) / 2, CHANNEL_3);
     // embedi_scope_show();
-    printf("%d %d %d \n", (int)pwm, (int)balance_pwm, (int)velocity_pwm);
+    printf("%d %d %d v:%d\n", (int)pwm, (int)balance_pwm, (int)velocity_pwm, (int)velocity);
 #endif
 #endif
-
-    if (pwm > 0) {
-        embedi_set_direction(FORDWARD);
-    } else {
-        embedi_set_direction(BACKWARD);
+    abnormal_check();
+    if (!abnormal_protect) {
+        if (pwm > 0) {
+            embedi_set_direction(FORDWARD);
+        } else {
+            embedi_set_direction(BACKWARD);
+        }
+        embedi_motor_start((int)pwm, (int)pwm);
     }
-    embedi_motor_start((int)pwm, (int)pwm);
 }
 
 static void _idle_heart_beat(void)
@@ -105,6 +137,7 @@ void embedi_task_function(void const *argument)
             default:
                 _idle_heart_beat();
                 embedi_motor_sotp();
+                _reset_parameters();
                 break;
             }
         }
@@ -113,6 +146,12 @@ void embedi_task_function(void const *argument)
 
 void embedi_wheels_init(void)
 {
+    balance_pwm = 0;
+    velocity_pwm = 0;
+
+    embedi_pid_init(&balance_pd, BALANCE_T, BALANCE_P, 0, BALANCE_D);
+    embedi_pid_init(&velocity_pi, VELOCITY_T, VELOCITY_P, VELOCITY_I, VELOCITY_D);
+
     xSemaphore = xSemaphoreCreateBinary();
     osThreadDef(embedi_task, embedi_task_function, osPriorityNormal, 0, 512);
     _task_handle = osThreadCreate(osThread(embedi_task), NULL);

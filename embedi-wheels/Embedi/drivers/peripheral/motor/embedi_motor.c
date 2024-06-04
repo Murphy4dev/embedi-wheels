@@ -6,7 +6,7 @@
 
 #define SPEED_DIRECTION (-1)     // 0 or -1
 #define RIGHT_LEFT_DIRECTION (1) // 0 or 1
-#define MAX_DUTY 4199
+#define MAX_DUTY 7199
 
 static int _read_encoder(int tim)
 {
@@ -96,7 +96,7 @@ void embedi_motor_start(int left, int right)
         right = -MAX_DUTY;
         force_stop = 1;
     }
-
+    force_stop = 0;
     if (force_stop) {
         _set_pwm(0, 0);
         return;

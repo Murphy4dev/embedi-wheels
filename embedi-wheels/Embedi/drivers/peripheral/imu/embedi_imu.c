@@ -7,8 +7,8 @@
 #include "embedi_math.h"
 #include "embedi_module_init.h"
 #include "embedi_scope.h"
-#include "embedi_test.h"
 #include "embedi_system.h"
+#include "embedi_test.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -155,7 +155,7 @@ void embedi_imu_init(void)
     _read_from_flash();
 
     embedi_enable_sensor(0);
-    // embedi_2d_kalman_init();
+    embedi_2d_kalman_init();
     embedi_6d_kalman_init();
 }
 
@@ -331,7 +331,13 @@ static void _read_from_flash(void)
     union embedi_imu read_data;
     uint8_t len = sizeof(read_data._buf) / 2 + ((sizeof(read_data._buf) % 2) ? 1 : 0);
 
-    embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+    //embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+    read_data.bias.accel.x_bias = -905;
+    read_data.bias.accel.y_bias = -339;
+    read_data.bias.accel.z_bias = 2168;
+    read_data.bias.gyro.x_bias = 4;
+    read_data.bias.gyro.y_bias = 2;
+    read_data.bias.gyro.z_bias = -26;
     printf("read %d %d %d %d %d %d len: %d\n",
            read_data.bias.accel.x_bias,
            read_data.bias.accel.y_bias,
@@ -467,9 +473,9 @@ void embedi_get_roll_angle(float *angle)
 #endif
 #else
 #if 0
-    printf("angle: %d %d %d\n", (int)(accel_angle * 1000 * ANGLE_DIRECTION),
-           (int)(m->matrix[0][0] * 1000 * ANGLE_DIRECTION),
-           (int)(m->matrix[1][0] * 1000 * ANGLE_DIRECTION));
+    printf("angle: %f %f %f\n", (accel_angle * ANGLE_DIRECTION),
+           (m->matrix[0][0] * ANGLE_DIRECTION),
+           (m->matrix[1][0] * ANGLE_DIRECTION));
 #endif
 #endif
 }
@@ -527,15 +533,15 @@ void embedi_get_euler_angle(float *angle)
     embedi_data_to_scope(accel[2] * 10, CHANNEL_5);
     embedi_data_to_scope(fusion_accel.matrix[2][0] * 10, CHANNEL_6);
 #endif
-    //embedi_data_to_scope(angle[0] * rad2deg, CHANNEL_1);
-    //embedi_data_to_scope(angle[1] * rad2deg, CHANNEL_2);
-    //embedi_data_to_scope(angle[2] * rad2deg, CHANNEL_3);
-    //embedi_scope_show();
-    // printf("quat: %f %f %f %f\n", q0, q1, q2, q3);
+    // embedi_data_to_scope(angle[0] * rad2deg, CHANNEL_1);
+    // embedi_data_to_scope(angle[1] * rad2deg, CHANNEL_2);
+    // embedi_data_to_scope(angle[2] * rad2deg, CHANNEL_3);
+    // embedi_scope_show();
+    //  printf("quat: %f %f %f %f\n", q0, q1, q2, q3);
     printf("angle: %f %f %f\n",
-        angle[0] * rad2deg,
-        angle[1] * rad2deg, 
-        angle[2] * rad2deg);
+           angle[0] * rad2deg,
+           angle[1] * rad2deg,
+           angle[2] * rad2deg);
 #endif
 #else
 #if 0

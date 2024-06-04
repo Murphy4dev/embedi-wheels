@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include "embedi_config.h"
 #include "embedi_flash.h"
-#include "embedi_test.h"
 #include "embedi_system.h"
+#include "embedi_test.h"
 
 static uint16_t _read_data(uint32_t addr)
 {
@@ -103,11 +103,8 @@ void embedi_flash_test(void)
     uint8_t read_buf[12];
     uint8_t len = sizeof(write_buf) / 2 + ((sizeof(write_buf) % 2) ? 1 : 0);
 
-    if (embedi_get_run_state() == FLASH_WRITE) {
-        printf("write %s %d %d \n", write_buf, len, embedi_get_run_state());
-        embedi_write_flash(IMU_ADDR, (uint16_t *)write_buf, len);
-    } else if (embedi_get_run_state() == FLASH_READ) {
-        embedi_read_flash(IMU_ADDR, (uint16_t *)read_buf, len);
-        printf("read %s %d %d \n", read_buf, len, embedi_get_run_state());
-    }
+    printf("write %s %d %d \n", write_buf, len, embedi_get_run_state());
+    embedi_write_flash(IMU_ADDR, (uint16_t *)write_buf, len);
+    embedi_read_flash(IMU_ADDR, (uint16_t *)read_buf, len);
+    printf("read %s %d %d \n", read_buf, len, embedi_get_run_state());
 }

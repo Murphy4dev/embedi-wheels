@@ -11,15 +11,15 @@ enum {
     /* 3 */
     IMU_CALIBRATION = 51,
     /* 4 */
-    RESERVE1 = 52,
+    PID_P = 52,
     /* 5 */
-    RESERVE2 = 53,
+    PID_I = 53,
     /* 6 */
-    FLASH_WRITE = 54,
+    PID_D = 54,
     /* 7 */
     FLASH_READ = 55,
     /* 9 */
-    RUNNING_SWICH = 57
+    FLASH_WRITE = 57
 };
 
 #endif
