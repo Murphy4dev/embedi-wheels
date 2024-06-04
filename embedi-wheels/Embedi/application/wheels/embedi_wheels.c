@@ -1,3 +1,4 @@
+#include "embedi_wheels.h"
 #include "cmsis_os.h"
 #include "embedi_2d_kalman.h"
 #include "embedi_6d_kalman.h"
@@ -41,6 +42,25 @@ static float velocity_pwm = 0;
 static float velocity = 0;
 static float velocity_last = 0;
 static float abnormal_protect = 0;
+
+void imu_irq_cb(int irq_num)
+{
+    if (irq_num == IMU_IRQ_GPIO) {
+        if (xSemaphore) {
+            xSemaphoreGiveFromISR(xSemaphore, NULL);
+        }
+    }
+}
+irq_register(imu_irq_cb);
+
+void key_irq_cb(int irq_num)
+{
+    if (irq_num == KEY_IRQ_GPIO) {
+        printf("START key press \n");
+        embedi_set_run_state(_START);
+    }
+}
+irq_register(key_irq_cb);
 
 static void _reset_parameters(void)
 {
@@ -144,6 +164,15 @@ void embedi_task_function(void const *argument)
     }
 }
 
+osTimerId wheels_handle;
+void timer_function(void const *argument)
+{
+    if (xSemaphore) {
+        xSemaphoreGiveFromISR(xSemaphore, NULL);
+    }
+    printf("5ms timer \n");
+}
+
 void embedi_wheels_init(void)
 {
     balance_pwm = 0;
@@ -155,17 +184,12 @@ void embedi_wheels_init(void)
     xSemaphore = xSemaphoreCreateBinary();
     osThreadDef(embedi_task, embedi_task_function, osPriorityNormal, 0, 512);
     _task_handle = osThreadCreate(osThread(embedi_task), NULL);
-}
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    if (GPIO_Pin == MPU6050_INT_Pin) {
-        if (xSemaphore) {
-            xSemaphoreGiveFromISR(xSemaphore, NULL);
-        }
-    } else if (GPIO_Pin == KEY_Pin) {
-        printf("START key press \n");
-        embedi_set_run_state(_START);
+    if (!IMU_IRQ_GPIO) {
+        osTimerDef(wheels_timer, timer_function);
+        wheels_handle = osTimerCreate(osTimer(wheels_timer), osTimerPeriodic, NULL);
+        osTimerStart(wheels_handle, 5);
+        printf("start 5ms timer \n");
     }
 }
 

@@ -5,8 +5,13 @@
 extern "C" {
 #endif
 #define CFG_STM32F1XX
+
 #ifdef CFG_STM32F1XX
 #include "stm32f1xx_hal.h"
+#elif defined CFG_STM32F4XX
+#include "stm32f4xx_hal.h"
+#else
+#error no specific platfom
 #endif
 
 #define CFG_FREERTOS_ENABLE
@@ -16,14 +21,19 @@ extern "C" {
 #define CFG_PRINTF_TO_UART 1
 
 /* DELAY CONFIG */
-#undef CFG_TIMER_DELAY_ENABLE
-#define CFG_DELAY_TIMER_INDEX 2
-/* nop == 1 / CFG_SYSTEM_CLOCK us */
-#define CFG_SYSTEM_CLOCK 72
+//#define CFG_TIMER_DELAY_ENABLE
+//#define CFG_DELAY_TIMER_INDEX 2
+#define CFG_SYSTEM_CLOCK 72 //nop == 1 / CFG_SYSTEM_CLOCK us
 
 /* I2C CONFIG */
 #define CFG_I2C_GPIO_SIMULATION
 #define CFG_I2C_INDEX 1
+
+/* PWM CONFIG */
+#define CFG_PWM_ENBALE
+#define CFG_PWM_TIMER htim1
+#define CFG_ENCODER1_TIMER htim2
+#define CFG_ENCODER2_TIMER htim4
 
 /* IMU data show just only one micro is 1*/
 #define CFG_IMU_DATA_SCOPE_SHOW

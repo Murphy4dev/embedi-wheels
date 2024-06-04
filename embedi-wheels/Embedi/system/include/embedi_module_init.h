@@ -16,4 +16,11 @@ const init_t __embedi_##fn __attribute__((section("embedi_platform_init")))  __a
 const init_t __embedi_##fn __attribute__((section("embedi_app_init")))  __attribute__((used)) = fn
 
 void embedi_module_init(void);
+
+typedef void (*irq_cb_t)(int irq_num);
+
+#define irq_register(fn) \
+const irq_cb_t __embedi_##fn __attribute__((section("embedi_irq")))  __attribute__((used)) = fn
+void embedi_irq_call(int irq_num);
+
 #endif

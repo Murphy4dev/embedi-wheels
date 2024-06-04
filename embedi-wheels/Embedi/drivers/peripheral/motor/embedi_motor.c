@@ -130,14 +130,16 @@ void motor_test(void)
 
 static void motor_init(void)
 {
-    extern TIM_HandleTypeDef htim1;
-    extern TIM_HandleTypeDef htim2;
-    extern TIM_HandleTypeDef htim4;
+#ifdef CFG_PWM_ENBALE
+    extern TIM_HandleTypeDef CFG_PWM_TIMER;
+    extern TIM_HandleTypeDef CFG_ENCODER1_TIMER;
+    extern TIM_HandleTypeDef CFG_ENCODER2_TIMER;
 
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
-    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+    HAL_TIM_PWM_Start(&CFG_PWM_TIMER, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&CFG_PWM_TIMER, TIM_CHANNEL_4);
+    HAL_TIM_Encoder_Start(&CFG_ENCODER1_TIMER, TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&CFG_ENCODER2_TIMER, TIM_CHANNEL_ALL);
+#endif
 }
 
 driver_init(motor_init);

@@ -47,3 +47,19 @@ void embedi_module_init(void)
     }
     printf("app init \n");
 }
+
+
+extern int embedi_irq$$Base;
+extern int embedi_irq$$Length;
+void embedi_irq_call(int irq_num)
+{
+    irq_cb_t *irq_call = (irq_cb_t *)&embedi_irq$$Base;
+    int count = 0;
+
+    /*early --> late*/
+    count = (int)(&embedi_irq$$Length) / sizeof(irq_cb_t);
+    while (count--) {
+        (*irq_call)(irq_num);
+        irq_call++;
+    }
+}

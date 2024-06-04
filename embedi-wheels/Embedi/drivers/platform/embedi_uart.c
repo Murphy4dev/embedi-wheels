@@ -103,6 +103,11 @@ int fputc(int ch, FILE *f)
 {
     return ch;
 }
+
+void embedi_uart_send_byte(const uint8_t data)
+{
+    (void)data;
+}
 #endif /* CFG_UART_ENABLE */
 
 void embedi_uart_init(void)
@@ -111,4 +116,5 @@ void embedi_uart_init(void)
     embedi_enable_uart1_interrupt();
 #endif
 }
+
 platform_init(embedi_uart_init);
