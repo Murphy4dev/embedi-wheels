@@ -16,9 +16,9 @@ extern "C" {
 
 #define CFG_FREERTOS_ENABLE
 
-/* UART CONFIG*/
+/* UART CONFIG need specific configration*/
 #define CFG_UART_ENABLE
-#define CFG_PRINTF_TO_UART 1
+#define CFG_PRINTF_TO_UART_INDEX 1
 
 /* DELAY CONFIG */
 //#define CFG_TIMER_DELAY_ENABLE
@@ -29,8 +29,8 @@ extern "C" {
 #define CFG_I2C_GPIO_SIMULATION
 #define CFG_I2C_INDEX 1
 
-/* PWM CONFIG */
-#define CFG_PWM_ENBALE
+/* PWM CONFIG need specific configration*/
+#define CFG_MOTOR_ENBALE
 #define CFG_PWM_TIMER htim1
 #define CFG_ENCODER1_TIMER htim2
 #define CFG_ENCODER2_TIMER htim4

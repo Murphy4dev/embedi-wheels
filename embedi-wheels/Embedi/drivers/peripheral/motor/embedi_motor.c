@@ -4,6 +4,10 @@
 #include "embedi_test.h"
 #include <stdio.h>
 
+#ifndef CFG_MOTOR_ENBALE
+#warning you need to do specific motor configration and enable CFG_MOTOR_ENBALE in embedi_config.h
+#endif
+
 #define SPEED_DIRECTION (-1)     // 0 or -1
 #define RIGHT_LEFT_DIRECTION (1) // 0 or 1
 #define MAX_DUTY 7199
@@ -130,7 +134,7 @@ void motor_test(void)
 
 static void motor_init(void)
 {
-#ifdef CFG_PWM_ENBALE
+#ifdef CFG_MOTOR_ENBALE
     extern TIM_HandleTypeDef CFG_PWM_TIMER;
     extern TIM_HandleTypeDef CFG_ENCODER1_TIMER;
     extern TIM_HandleTypeDef CFG_ENCODER2_TIMER;

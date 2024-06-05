@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include "embedi_module_init.h"
 
+#ifndef CFG_UART_ENABLE
+#warning you can do specific uart configration for printf and enable CFG_UART_ENABLE in embedi_config.h
+#endif
+
 #define UART_BUFF_LEN 1
 #define UART_TIMEOUT 100
 
@@ -22,13 +26,13 @@ uint8_t uart2_buff[UART_BUFF_LEN];
 uint8_t uart3_buff[UART_BUFF_LEN];
 uint8_t uart4_buff[UART_BUFF_LEN];
 
-#if (CFG_PRINTF_TO_UART == 1)
+#if (CFG_PRINTF_TO_UART_INDEX == 1)
 extern UART_HandleTypeDef huart1;
 UART_HandleTypeDef *huart = &huart1;
-#elif (CFG_PRINTF_TO_UART == 2)
+#elif (CFG_PRINTF_TO_UART_INDEX == 2)
 extern UART_HandleTypeDef huart2;
 UART_HandleTypeDef *huart = &huart2;
-#elif (CFG_PRINTF_TO_UART == 3)
+#elif (CFG_PRINTF_TO_UART_INDEX == 3)
 extern UART_HandleTypeDef huart3;
 UART_HandleTypeDef *huart = &huart3;
 #endif
@@ -41,11 +45,11 @@ void embedi_enable_uart1_interrupt(void)
 void embedi_uart_send_byte(const uint8_t data)
 {
     USART_TypeDef *uart = NULL;
-#if (CFG_PRINTF_TO_UART == 1)
+#if (CFG_PRINTF_TO_UART_INDEX == 1)
     uart = USART1;
-#elif (CFG_PRINTF_TO_UART == 2)
+#elif (CFG_PRINTF_TO_UART_INDEX == 2)
     uart = USART2;
-#elif (CFG_PRINTF_TO_UART == 3)
+#elif (CFG_PRINTF_TO_UART_INDEX == 3)
     uart = USART3;
 #else
     uart = NULL;
@@ -81,11 +85,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 int fputc(int ch, FILE *f)
 {
     USART_TypeDef *uart = NULL;
-#if (CFG_PRINTF_TO_UART == 1)
+#if (CFG_PRINTF_TO_UART_INDEX == 1)
     uart = USART1;
-#elif (CFG_PRINTF_TO_UART == 2)
+#elif (CFG_PRINTF_TO_UART_INDEX == 2)
     uart = USART2;
-#elif (CFG_PRINTF_TO_UART == 3)
+#elif (CFG_PRINTF_TO_UART_INDEX == 3)
     uart = USART3;
 #else
     uart = NULL;

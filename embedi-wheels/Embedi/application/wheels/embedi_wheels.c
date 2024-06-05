@@ -14,9 +14,6 @@
 #include "embedi_test.h"
 #include "main.h"
 #include <stdio.h>
-#ifdef CFG_UART_ENABLE
-#include "embedi_uart.h"
-#endif
 
 // #define TEST_MODE
 #define USE_6D_ALGO
@@ -174,9 +171,7 @@ void timer_function(void const *argument)
 
 void embedi_wheels_init(void)
 {
-    balance_pwm = 0;
-    velocity_pwm = 0;
-
+    _reset_parameters();
     embedi_pid_init(&balance_pd, BALANCE_T, BALANCE_P, 0, BALANCE_D);
     embedi_pid_init(&velocity_pi, VELOCITY_T, VELOCITY_P, VELOCITY_I, VELOCITY_D);
 

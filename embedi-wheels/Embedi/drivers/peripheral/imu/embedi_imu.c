@@ -330,14 +330,16 @@ static void _read_from_flash(void)
 
     union embedi_imu read_data;
     uint8_t len = sizeof(read_data._buf) / 2 + ((sizeof(read_data._buf) % 2) ? 1 : 0);
-
-    //embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+#if 1
+    embedi_read_flash(IMU_ADDR, (uint16_t *)read_data._buf, len);
+#else
     read_data.bias.accel.x_bias = -905;
     read_data.bias.accel.y_bias = -339;
     read_data.bias.accel.z_bias = 2168;
     read_data.bias.gyro.x_bias = 4;
     read_data.bias.gyro.y_bias = 2;
     read_data.bias.gyro.z_bias = -26;
+#endif
     printf("read %d %d %d %d %d %d len: %d\n",
            read_data.bias.accel.x_bias,
            read_data.bias.accel.y_bias,
